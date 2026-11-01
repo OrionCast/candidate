@@ -1,3 +1,5 @@
+import { Tick02Icon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Suspense } from "react"
@@ -47,7 +49,7 @@ export default function ApplyPage() {
                 {checklist.map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm text-slate-700">
                     <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-congo-mid text-[10px] font-bold text-white">
-                      ✓
+                      <HugeiconsIcon icon={Tick02Icon} size={12} strokeWidth={3} />
                     </span>
                     {item}
                   </li>

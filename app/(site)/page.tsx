@@ -1,5 +1,13 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import {
+  BankIcon,
+  ClipboardIcon,
+  News01Icon,
+  Rocket01Icon,
+  Tick02Icon,
+} from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowRightIcon } from "@/components/site/icons"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -30,7 +38,7 @@ const quickSteps = [
 
 const features = [
   {
-    icon: "📋",
+    icon: ClipboardIcon,
     kicker: "01 / Guide",
     title: "Comprendre la démarche",
     text: "Prenez connaissance des exigences requises, des critères de sélection et du calendrier officiel.",
@@ -40,7 +48,7 @@ const features = [
     kickerTone: "text-congo",
   },
   {
-    icon: "📰",
+    icon: News01Icon,
     kicker: "02 / Informations",
     title: "Rester informé",
     text: "Suivez en direct les communiqués officiels, les mises à jour et les avis de recrutement.",
@@ -50,7 +58,7 @@ const features = [
     kickerTone: "text-gold-ink",
   },
   {
-    icon: "🚀",
+    icon: Rocket01Icon,
     kicker: "03 / Postuler",
     title: "Déposer un dossier",
     text: "Remplissez le formulaire en ligne sécurisé et téléversez vos pièces justificatives instantanément.",
@@ -134,7 +142,7 @@ export default function HomePage() {
               {["Procédure 100% en ligne", "Données sécurisées"].map((label) => (
                 <div key={label} className="flex items-center gap-2">
                   <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/30 text-xs font-bold text-gold">
-                    ✓
+                    <HugeiconsIcon icon={Tick02Icon} size={12} strokeWidth={3} />
                   </span>
                   {label}
                 </div>
@@ -150,7 +158,7 @@ export default function HomePage() {
                   <Badge className="rounded-md bg-congo-soft px-3 py-1 text-[10px] font-bold tracking-wider text-congo uppercase">
                     Espace Candidat
                   </Badge>
-                  <span className="text-2xl">🏛️</span>
+                  <HugeiconsIcon icon={BankIcon} size={28} strokeWidth={1.6} className="text-congo" />
                 </div>
                 <h3 className="mb-3 font-heading text-2xl font-bold text-gray-900">
                   Un dossier simplifié, des démarches clarifiées.
@@ -221,8 +229,7 @@ export default function HomePage() {
                   <div
                     className={`mb-6 flex size-12 items-center justify-center rounded-xl text-xl transition-colors ${f.tone}`}
                   >
-                    {f.icon}
-                  </div>
+                    <HugeiconsIcon icon={f.icon} size={24} strokeWidth={1.8} />                  </div>
                   <span className={`text-xs font-bold tracking-wider uppercase ${f.kickerTone}`}>{f.kicker}</span>
                   <h3 className="mt-2 mb-3 text-xl font-bold text-gray-900">{f.title}</h3>
                   <p className="mb-6 text-sm leading-relaxed text-gray-600">{f.text}</p>

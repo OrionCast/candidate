@@ -1,5 +1,7 @@
 "use client"
 
+import { InformationCircleIcon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import Link from "next/link"
 import { useMemo, useState } from "react"
 import { SearchIcon } from "@/components/site/icons"
@@ -116,7 +118,9 @@ export function NewsList() {
           </div>
 
           <div className="flex items-start gap-4 rounded-2xl border border-gold-line bg-gold-soft p-6 shadow-sm sm:p-8">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gold text-xl text-gold-ink">ℹ️</div>
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gold text-gold-ink">
+              <HugeiconsIcon icon={InformationCircleIcon} size={22} strokeWidth={2} />
+            </div>
             <div className="space-y-1 text-sm leading-relaxed text-amber-900">
               <h4 className="text-base font-bold text-amber-950">Avis d'information institutionnel</h4>
               <p>

@@ -1,3 +1,5 @@
+import { Clock01Icon, File01Icon, HelpCircleIcon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { ContactForm } from "@/components/site/contact-form"
@@ -9,13 +11,13 @@ export const metadata: Metadata = { title: "Contact" }
 
 const topics = [
   {
-    symbol: "?",
+    icon: HelpCircleIcon,
     tone: "bg-gradient-to-br from-congo to-congo-mid text-white",
     title: "Question sur une candidature",
     text: "Précisez à quelle étape vous rencontrez une difficulté.",
   },
   {
-    symbol: "▤",
+    icon: File01Icon,
     tone: "bg-gradient-to-br from-gold to-gold-line text-gold-ink",
     title: "Documents et formats",
     text: "Consultez la page candidature pour connaître les formats acceptés.",
@@ -23,7 +25,7 @@ const topics = [
     cta: "Consulter les consignes →",
   },
   {
-    symbol: "◷",
+    icon: Clock01Icon,
     tone: "bg-gradient-to-br from-flag-red to-[#b81c18] text-white",
     title: "Résultats et annonces",
     text: "Les informations disponibles sont publiées dans la rubrique actualités.",
@@ -66,7 +68,7 @@ export default function ContactPage() {
                   {index > 0 && <div className="my-5 h-px bg-slate-200" />}
                   <div className="flex items-start gap-4">
                     <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl font-bold ${topic.tone}`}>
-                      {topic.symbol}
+                      <HugeiconsIcon icon={topic.icon} size={20} strokeWidth={2} />
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-slate-800">{topic.title}</p>
