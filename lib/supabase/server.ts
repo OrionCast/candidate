@@ -1,8 +1,12 @@
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
+import { connection } from "next/server"
 
 /** Client Supabase lié à la session de l'utilisateur (cookies). Soumis à la RLS. */
 export async function createClient() {
+  // Le client lit l'heure (Date.now) pour juger si la session a expiré : on sort
+  // du prérendu avant, sinon Next.js signale une route bloquante.
+  await connection()
   const cookieStore = await cookies()
 
   return createServerClient(
