@@ -49,6 +49,17 @@ export type FinalizeResult = { ok: true; reference: string } | { ok: false; erro
 
 const firstIssue = (error: z.ZodError) => error.issues[0]?.message ?? "Données invalides."
 
+/** La ville doit exister et être active : le formulaire n'est qu'une commodité, pas une garantie. */
+async function isActiveCity(name: string) {
+  const { data } = await createAdminClient()
+    .from("cities")
+    .select("id")
+    .eq("name", name)
+    .eq("active", true)
+    .maybeSingle()
+  return Boolean(data)
+}
+
 /**
  * Étape 1 : valide le formulaire et délivre des URLs signées.
  * Les fichiers partent ensuite directement du navigateur vers Supabase Storage,
@@ -58,6 +69,10 @@ export async function prepareApplication(input: unknown): Promise<PrepareResult>
   const parsed = prepareSchema.safeParse(input)
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) }
   const { files } = parsed.data
+
+  if (!(await isActiveCity(parsed.data.applicant.city))) {
+    return { ok: false, error: "Veuillez sélectionner une ville dans la liste." }
+  }
 
   for (const kind of DOCUMENT_KINDS) {
     const problem = checkFile(kind, files[kind])
@@ -95,6 +110,10 @@ export async function finalizeApplication(input: unknown): Promise<FinalizeResul
   const parsed = finalizeSchema.safeParse(input)
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) }
   const { ref, applicant, paths } = parsed.data
+
+  if (!(await isActiveCity(applicant.city))) {
+    return { ok: false, error: "Veuillez sélectionner une ville dans la liste." }
+  }
 
   const admin = createAdminClient()
   const storage = admin.storage.from(BUCKET)

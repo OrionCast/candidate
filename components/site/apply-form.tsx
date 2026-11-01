@@ -9,9 +9,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Spinner } from "@/components/ui/spinner"
 import { createBrowserSupabase } from "@/lib/supabase/browser"
 import {
-  CITIES,
   DOCUMENT_KINDS,
   DOCUMENT_RULES,
   applicantSchema,
@@ -28,7 +28,7 @@ function Required() {
   return <span className="text-flag-red">*</span>
 }
 
-export function ApplyForm() {
+export function ApplyForm({ cities }: { cities: string[] }) {
   const formRef = useRef<HTMLFormElement>(null)
   const [city, setCity] = useState("")
   const [pending, setPending] = useState(false)
@@ -153,7 +153,7 @@ export function ApplyForm() {
                   <SelectValue placeholder="— Sélectionnez une ville —" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CITIES.map((name) => (
+                  {cities.map((name) => (
                     <SelectItem key={name} value={name}>
                       {name}
                     </SelectItem>
@@ -208,8 +208,15 @@ export function ApplyForm() {
               size="lg"
               className="h-12 gap-2 rounded-lg bg-gradient-to-br from-congo to-congo-mid px-6 text-sm font-semibold text-white shadow-md hover:-translate-y-0.5 hover:shadow-lg"
             >
-              {pending ? "Envoi en cours…" : "Envoyer ma candidature"}
-              {!pending && <ArrowRightIcon />}
+              {pending ? (
+                <>
+                  <Spinner /> Envoi en cours…
+                </>
+              ) : (
+                <>
+                  Envoyer ma candidature <ArrowRightIcon />
+                </>
+              )}
             </Button>
             <span role="status" aria-live="polite" className="text-sm font-medium text-flag-red">
               {error}

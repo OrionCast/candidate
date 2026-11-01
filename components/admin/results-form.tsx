@@ -6,6 +6,7 @@ import { FlagIcon, SendIcon } from "@/components/site/icons"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 import { createBrowserSupabase } from "@/lib/supabase/browser"
 import { MAX_FILE_SIZE } from "@/lib/validation"
@@ -99,7 +100,7 @@ export function ResultsForm({ initialContent, hasPdf }: { initialContent: string
 
         <div className="flex flex-wrap items-center gap-3 pt-1">
           <Button type="submit" disabled={pending} className="h-11 gap-2 rounded-lg px-5 font-semibold">
-            <SendIcon /> Publier les résultats
+            {pending ? <Spinner /> : <SendIcon />} {pending ? "Publication…" : "Publier les résultats"}
           </Button>
           <span role="status" aria-live="polite" className={status?.error ? "text-sm text-flag-red" : "text-sm text-congo"}>
             {status?.text}

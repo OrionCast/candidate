@@ -5,6 +5,7 @@ Les migrations de `migrations/` sont à exécuter dans l'ordre (SQL Editor du ta
 1. `..._schema.sql` : tables `candidates` et `publication`, fonction `is_admin()`
 2. `..._rls.sql` : Row Level Security
 3. `..._storage.sql` : buckets `documents` (privé) et `results` (public)
+4. `..._cities.sql` : table `cities` (villes du formulaire, gérées depuis l'admin) avec Brazzaville et Pointe-Noire
 
 ## Donner le rôle admin à un compte
 

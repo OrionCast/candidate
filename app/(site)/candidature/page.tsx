@@ -3,10 +3,11 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Suspense } from "react"
-import { ApplyForm } from "@/components/site/apply-form"
+import { ApplyFormSection } from "@/components/site/apply-form-section"
 import { CheckIcon } from "@/components/site/icons"
 import { PageHero } from "@/components/site/page-hero"
 import { ResultsSection } from "@/components/site/results-section"
+import { ApplyFormSkeleton, ResultsSkeleton } from "@/components/site/skeletons"
 
 export const metadata: Metadata = { title: "Candidature" }
 
@@ -70,11 +71,13 @@ export default function ApplyPage() {
             </div>
           </aside>
 
-          <ApplyForm />
+          <Suspense fallback={<ApplyFormSkeleton />}>
+            <ApplyFormSection />
+          </Suspense>
         </div>
       </section>
 
-      <Suspense fallback={<div className="h-48 bg-[#e8f2ea]" />}>
+      <Suspense fallback={<ResultsSkeleton />}>
         <ResultsSection />
       </Suspense>
     </>

@@ -1,7 +1,5 @@
 import { z } from "zod"
 
-export const CITIES = ["Brazzaville", "Pointe-Noire"] as const
-
 export const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 export const DOCUMENT_KINDS = ["identity", "diploma", "cv", "motivation"] as const
@@ -43,7 +41,8 @@ export const applicantSchema = z.object({
     .max(180)
     .refine((v) => v === "" || z.email().safeParse(v).success, "Adresse e-mail invalide."),
   phone: z.string().trim().min(1, "Le numéro de téléphone est obligatoire.").max(30),
-  city: z.enum(CITIES, "Veuillez sélectionner une ville."),
+  // L'appartenance à la liste des villes actives est vérifiée côté serveur.
+  city: z.string().trim().min(1, "Veuillez sélectionner une ville.").max(100),
   address: z.string().trim().min(1, "L'adresse est obligatoire.").max(255),
 })
 export type Applicant = z.infer<typeof applicantSchema>
@@ -63,6 +62,12 @@ export function checkFile(kind: DocumentKind, file: { type: string; size: number
   if (!mimes.includes(file.type)) return `Format non autorisé pour : ${label}.`
   return null
 }
+
+export const cityNameSchema = z
+  .string()
+  .trim()
+  .min(1, "Le nom de la ville est obligatoire.")
+  .max(100, "Le nom de la ville est trop long (100 caractères maximum).")
 
 export const REF_PATTERN = /^CG-\d{4}-\d{6}$/
 export const RESULTS_FILE_PATTERN = /^[a-f0-9]{24}\.pdf$/

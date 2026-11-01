@@ -6,6 +6,7 @@ import { ArrowRightIcon } from "@/components/site/icons"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Spinner } from "@/components/ui/spinner"
 
 export function LoginForm() {
   const [state, action, pending] = useActionState<LoginState, FormData>(login, {})
@@ -25,8 +26,15 @@ export function LoginForm() {
         <Input id="password" name="password" type="password" required autoComplete="current-password" placeholder="••••••••" className="h-11 rounded-lg bg-white" />
       </div>
       <Button type="submit" disabled={pending} size="lg" className="h-12 w-full gap-2 rounded-lg font-semibold">
-        {pending ? "Connexion…" : "Se connecter"}
-        {!pending && <ArrowRightIcon />}
+        {pending ? (
+          <>
+            <Spinner /> Connexion…
+          </>
+        ) : (
+          <>
+            Se connecter <ArrowRightIcon />
+          </>
+        )}
       </Button>
       <p role="alert" className="min-h-5 text-center text-sm text-flag-red">
         {state.error}

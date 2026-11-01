@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import type { CandidateRow } from "@/lib/candidates"
@@ -168,7 +169,16 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
                 ))}
               </div>
 
-              {docs.status === "loading" && <p className="text-sm text-slate-500">Chargement des documents…</p>}
+              {docs.status === "loading" && (
+                <div role="status" aria-label="Chargement des documents" className="space-y-4">
+                  {DOCUMENT_KINDS.map((kind) => (
+                    <div key={kind} className="space-y-2">
+                      <Skeleton className="h-5 w-40" />
+                      <Skeleton className="h-4 w-64" />
+                    </div>
+                  ))}
+                </div>
+              )}
               {docs.status === "error" && <p className="text-sm text-flag-red">{docs.message}</p>}
               {docs.status === "ready" &&
                 DOCUMENT_KINDS.map((kind) => {
