@@ -1,317 +1,588 @@
-import type { Metadata } from "next"
-import Link from "next/link"
 import {
-  BankIcon,
-  ClipboardIcon,
-  News01Icon,
-  Rocket01Icon,
+  Award01Icon,
+  Calendar03Icon,
+  Call02Icon,
+  CloudIcon,
+  File02Icon,
+  Globe02Icon,
+  Location01Icon,
+  Mortarboard01Icon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { ArrowRightIcon } from "@/components/site/icons"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import type { Metadata } from "next"
+import Link from "next/link"
+import type { ReactNode } from "react"
+import { Particles } from "@/components/site/particles"
 
-export const metadata: Metadata = { title: "Accueil" }
+export const metadata: Metadata = {
+  title: "Accueil",
+  description: "Programme PATN : formation gratuite de 300 jeunes en Réseaux, Connectivité et Cloud.",
+}
 
-const quickSteps = [
+type Icon = Parameters<typeof HugeiconsIcon>[0]["icon"]
+
+function Glyph({ icon, size = 24 }: { icon: Icon; size?: number }) {
+  return <HugeiconsIcon icon={icon} size={size} strokeWidth={1.8} />
+}
+
+const keyFigures: { icon: Icon; tone: string; title: ReactNode; text: string }[] = [
   {
-    n: "01",
-    title: "S'informer",
-    text: "Consultez les dernières annonces et vérifiez votre éligibilité.",
-    tone: "bg-congo-soft text-congo",
+    icon: Mortarboard01Icon,
+    tone: "from-emerald-100 to-emerald-50 border-emerald-100 text-congo",
+    title: <p className="text-4xl leading-none font-black tracking-tight text-congo">300</p>,
+    text: "Jeunes à former",
   },
   {
-    n: "02",
-    title: "Préparer ses pièces",
-    text: "Numérisez vos justificatifs officiels au format PDF ou image.",
-    tone: "bg-gold/30 text-gold-ink",
+    icon: Location01Icon,
+    tone: "from-blue-100 to-blue-50 border-blue-100 text-blue-700",
+    title: <p className="text-xl leading-none font-extrabold text-slate-900">Deux villes</p>,
+    text: "Brazzaville et Pointe-Noire",
   },
   {
-    n: "03",
-    title: "Soumettre & Suivre",
-    text: "Validez votre formulaire et conservez précieusement votre code.",
-    tone: "bg-flag-red/10 text-flag-red",
+    icon: CloudIcon,
+    tone: "from-yellow-100 to-yellow-50 border-yellow-100 text-yellow-700",
+    title: <p className="text-xl leading-none font-extrabold text-slate-900">Deux parcours</p>,
+    text: "Réseaux et Infrastructure Cloud",
   },
 ]
 
-const features = [
-  {
-    icon: ClipboardIcon,
-    kicker: "01 / Guide",
-    title: "Comprendre la démarche",
-    text: "Prenez connaissance des exigences requises, des critères de sélection et du calendrier officiel.",
-    href: "#etapes",
-    cta: "Découvrir les étapes",
-    tone: "bg-congo-soft text-congo group-hover:bg-congo group-hover:text-white",
-    kickerTone: "text-congo",
-  },
-  {
-    icon: News01Icon,
-    kicker: "02 / Informations",
-    title: "Rester informé",
-    text: "Suivez en direct les communiqués officiels, les mises à jour et les avis de recrutement.",
-    href: "/actualites",
-    cta: "Voir les actualités",
-    tone: "bg-gold/20 text-gold-ink group-hover:bg-gold group-hover:text-slate-900",
-    kickerTone: "text-gold-ink",
-  },
-  {
-    icon: Rocket01Icon,
-    kicker: "03 / Postuler",
-    title: "Déposer un dossier",
-    text: "Remplissez le formulaire en ligne sécurisé et téléversez vos pièces justificatives instantanément.",
-    href: "/candidature",
-    cta: "Accéder au formulaire",
-    tone: "bg-flag-red/10 text-flag-red group-hover:bg-flag-red group-hover:text-white",
-    kickerTone: "text-flag-red",
-  },
+const criteria: ReactNode[] = [
+  <>
+    Être de <strong className="text-slate-900">nationalité congolaise</strong>.
+  </>,
+  <>
+    Être âgé de <strong className="text-slate-900">18 à 30 ans</strong>.
+  </>,
+  "Être sans emploi ou disponible à temps plein pour suivre la formation.",
+  <>
+    Être titulaire, au minimum, d'un <strong className="text-slate-900">baccalauréat</strong> (général, technique ou
+    professionnel).
+  </>,
+  "Disposer de compétences numériques générales de base.",
+  "Ne pas être actuellement inscrit dans un établissement d'enseignement supérieur.",
+  "Démontrer une motivation claire et documentée à suivre la formation.",
 ]
 
-const guide = [
-  {
-    title: "Prenez connaissance des annonces",
-    text: "Lisez attentivement les critères requis, la date limite de soumission et la liste des diplômes acceptés.",
-  },
-  {
-    title: "Rassemblez vos pièces numériques",
-    text: "Numérisez votre pièce d'identité valide ainsi que vos attestation(s) ou diplôme(s) au format PDF ou JPG (taille max 5 Mo).",
-  },
-  {
-    title: "Validez et notez votre numéro de dossier",
-    text: "Soumettez le formulaire et conservez précieusement le code unique de référence transmis lors de la confirmation.",
-  },
+const documents: ReactNode[] = [
+  <>
+    Une <strong className="text-slate-900">photo d'identité</strong> (format passeport).
+  </>,
+  <>
+    Une <strong className="text-slate-900">pièce d'identité</strong> (Acte de Naissance, CNI, Passeport ou Permis de
+    Conduire).
+  </>,
+  <>
+    Une photocopie du <strong className="text-slate-900">dernier diplôme</strong>.
+  </>,
+  <>
+    Une <strong className="text-slate-900">lettre de motivation (1 page maximum)</strong>, exposant les raisons de la
+    candidature et les objectifs post-formation.
+  </>,
+  <>
+    Un <strong className="text-slate-900">CV synthétique (1 page maximum)</strong>, précisant le parcours scolaire et
+    les compétences numériques acquises.
+  </>,
 ]
 
-const dots = (size: number) => ({
-  backgroundImage: "radial-gradient(#fff 1px, transparent 1px)",
-  backgroundSize: `${size}px ${size}px`,
-})
+/** Mini-réseau décoratif : relie les points 0-1, 1-2, 2-3 puis 1-4. */
+function CardNetwork({ points }: { points: [number, number][] }) {
+  return (
+    <svg className="card-net" viewBox="0 0 300 120" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+      {points.slice(1).map(([x, y], i) => (
+        <line key={`l${i}`} x1={points[i === 3 ? 1 : i][0]} y1={points[i === 3 ? 1 : i][1]} x2={x} y2={y} />
+      ))}
+      {points.map(([x, y], i) => (
+        <circle key={`c${i}`} cx={x} cy={y} r="3" />
+      ))}
+    </svg>
+  )
+}
 
 export default function HomePage() {
   return (
-    <div className="overflow-hidden bg-slate-50">
+    <>
       {/* Hero */}
-      <section
-        className="relative overflow-hidden px-4 py-20 text-white sm:px-6 lg:px-8 lg:py-28"
-        style={{ background: "linear-gradient(135deg, #05442d 0%, #075b3d 50%, #0a734e 100%)" }}
-      >
-        <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={dots(20)} />
-        <div className="pointer-events-none absolute -top-32 -right-32 size-[28rem] rounded-full bg-emerald-400/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 size-[28rem] rounded-full bg-gold/10 blur-3xl" />
+      <section className="hero-bg noise relative overflow-hidden text-white">
+        <Particles density={1 / 14000} link={140} />
+        <div className="hero-grid absolute inset-0" />
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="orb orb-3" />
 
-        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-12 lg:gap-8">
-          <div className="space-y-8 lg:col-span-7">
-            <div className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium tracking-wide backdrop-blur-md sm:text-sm">
-              <span className="size-2 animate-pulse rounded-full bg-gold" />
-              SERVICE PUBLIC · RÉPUBLIQUE DU CONGO
-            </div>
+        <svg className="network hidden md:block" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <line x1="80" y1="120" x2="300" y2="260" />
+          <line x1="300" y1="260" x2="520" y2="140" />
+          <line x1="520" y1="140" x2="760" y2="300" />
+          <line x1="760" y1="300" x2="1020" y2="180" />
+          <line x1="300" y1="260" x2="360" y2="520" />
+          <line x1="760" y1="300" x2="700" y2="560" />
+          <line x1="1020" y1="180" x2="1120" y2="420" />
+          <circle cx="80" cy="120" r="3" />
+          <circle cx="300" cy="260" r="3" />
+          <circle cx="520" cy="140" r="3" />
+          <circle cx="760" cy="300" r="3" />
+          <circle cx="1020" cy="180" r="3" />
+          <circle cx="360" cy="520" r="3" />
+          <circle cx="700" cy="560" r="3" />
+          <circle cx="1120" cy="420" r="3" />
+        </svg>
 
-            <h1 className="animate-fade-up font-heading text-4xl leading-[1.1] font-bold sm:text-5xl lg:text-6xl">
-              Votre avenir professionnel <br />
-              <span className="text-gold italic">commence ici.</span>
-            </h1>
-
-            <p className="animate-fade-up max-w-2xl text-lg leading-relaxed font-light text-emerald-100 sm:text-xl">
-              Accédez aux opportunités du service public, consultez les avis officiels et soumettez votre
-              dossier de candidature en quelques clics via un parcours sécurisé.
-            </p>
-
-            <div className="animate-fade-up flex flex-col gap-4 pt-2 sm:flex-row">
-              <Button
-                asChild
-                size="lg"
-                className="h-12 rounded-xl bg-gold px-8 font-bold text-slate-900 shadow-lg shadow-gold/20 hover:-translate-y-0.5 hover:bg-gold/90"
-              >
-                <Link href="/candidature">
-                  Déposer ma candidature <ArrowRightIcon size={20} className="ml-1" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="h-12 rounded-xl border-white/20 bg-white/10 px-8 font-semibold text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
-              >
-                <Link href="/actualites">Consulter les actualités</Link>
-              </Button>
-            </div>
-
-            <div className="animate-fade-up flex flex-wrap items-center gap-6 pt-4 text-sm text-emerald-200">
-              {["Procédure 100% en ligne", "Données sécurisées"].map((label) => (
-                <div key={label} className="flex items-center gap-2">
-                  <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/30 text-xs font-bold text-gold">
-                    <HugeiconsIcon icon={Tick02Icon} size={12} strokeWidth={3} />
-                  </span>
-                  {label}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="animate-fade-up relative lg:col-span-5">
-            <Card className="relative rounded-2xl border border-gray-100 bg-white p-0 text-gray-800 shadow-2xl transition-transform duration-500 hover:rotate-0 lg:rotate-1">
-              <div className="absolute top-0 left-0 h-1.5 w-full rounded-t-xl bg-gradient-to-r from-emerald-600 via-gold to-flag-red" />
-              <CardContent className="p-8 pt-10">
-                <div className="mb-6 flex items-start justify-between">
-                  <Badge className="rounded-md bg-congo-soft px-3 py-1 text-[10px] font-bold tracking-wider text-congo uppercase">
-                    Espace Candidat
-                  </Badge>
-                  <HugeiconsIcon icon={BankIcon} size={28} strokeWidth={1.6} className="text-congo" />
-                </div>
-                <h3 className="mb-3 font-heading text-2xl font-bold text-gray-900">
-                  Un dossier simplifié, des démarches clarifiées.
-                </h3>
-                <p className="mb-6 text-sm leading-relaxed text-gray-600">
-                  N'attendez plus. Préparez vos pièces justificatives (carte d'identité, diplômes) et
-                  complétez votre formulaire en toute simplicité.
-                </p>
-                <div className="mb-6 space-y-3 rounded-xl border border-slate-100 bg-slate-50 p-4 text-xs text-gray-600">
-                  <div className="flex items-center justify-between">
-                    <span>Pièce d'identité (PDF/JPG)</span>
-                    <span className="font-semibold text-congo">Requis</span>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-gray-200 pt-2">
-                    <span>Diplômes & Attestations</span>
-                    <span className="font-semibold text-congo">Requis</span>
-                  </div>
-                </div>
-                <Button asChild className="h-11 w-full rounded-lg font-semibold shadow-md hover:bg-congo-dark">
-                  <Link href="/candidature">Commencer ma démarche →</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Étapes rapides */}
-      <section className="border-b border-gray-200 bg-white py-10">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 md:grid-cols-3 lg:px-8">
-          {quickSteps.map((step) => (
-            <div key={step.n} className="flex items-start gap-4">
-              <div
-                className={`flex size-12 shrink-0 items-center justify-center rounded-xl text-lg font-bold ${step.tone}`}
-              >
-                {step.n}
+        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
+          <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="reveal lg:col-span-7">
+              <div className="glass mb-8 inline-flex items-center gap-2.5 rounded-full px-4 py-2 text-[11px] font-bold tracking-wide sm:text-xs">
+                <span className="relative flex size-2.5">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-yellow-400 opacity-70" />
+                  <span className="relative inline-flex size-2.5 rounded-full bg-yellow-400" />
+                </span>
+                PROGRAMME D'ACCÉLÉRATION DE LA TRANSFORMATION NUMÉRIQUE
               </div>
-              <div>
-                <h4 className="text-base font-bold text-gray-900">{step.title}</h4>
-                <p className="mt-1 text-sm text-gray-500">{step.text}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
-      {/* Fonctionnalités */}
-      <section className="py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto mb-16 max-w-3xl text-center">
-            <span className="text-xs font-bold tracking-widest text-congo uppercase">Espace centralisé</span>
-            <h2 className="mt-2 font-heading text-3xl font-bold text-gray-900 sm:text-4xl">
-              Un accès simple pour toutes vos démarches
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              Toutes les fonctionnalités nécessaires pour déposer, suivre et vous informer sur le programme
-              de recrutement national.
-            </p>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-3">
-            {features.map((f) => (
-              <Card
-                key={f.title}
-                className="group flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-              >
-                <div>
-                  <div
-                    className={`mb-6 flex size-12 items-center justify-center rounded-xl text-xl transition-colors ${f.tone}`}
-                  >
-                    <HugeiconsIcon icon={f.icon} size={24} strokeWidth={1.8} />                  </div>
-                  <span className={`text-xs font-bold tracking-wider uppercase ${f.kickerTone}`}>{f.kicker}</span>
-                  <h3 className="mt-2 mb-3 text-xl font-bold text-gray-900">{f.title}</h3>
-                  <p className="mb-6 text-sm leading-relaxed text-gray-600">{f.text}</p>
-                </div>
-                <Link href={f.href} className="inline-flex items-center text-sm font-bold text-congo hover:underline">
-                  {f.cta} <span className="ml-2">→</span>
-                </Link>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Guide en 3 étapes */}
-      <section id="etapes" className="relative overflow-hidden bg-congo-forest py-20 text-white">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.05]" style={dots(24)} />
-        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:px-8">
-          <div className="space-y-6 lg:col-span-5">
-            <span className="text-xs font-bold tracking-widest text-gold uppercase">Guide candidat</span>
-            <h2 className="font-heading text-3xl leading-tight font-bold sm:text-4xl">
-              Préparez votre candidature en 3 étapes simples.
-            </h2>
-            <p className="leading-relaxed font-light text-emerald-100">
-              Pour assurer un traitement rapide et efficace de votre dossier, veillez à suivre ces consignes
-              avant toute validation.
-            </p>
-            <div className="pt-4">
-              <Button asChild size="lg" className="h-12 rounded-xl bg-gold px-6 font-bold text-slate-900 shadow-lg hover:bg-gold/90">
-                <Link href="/candidature">
-                  Commencer la démarche <ArrowRightIcon className="ml-1" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-6 lg:col-span-7">
-            {guide.map((item, index) => (
-              <div
-                key={item.title}
-                className="flex gap-6 rounded-2xl border border-white/10 bg-white/5 p-6 transition-colors hover:bg-white/10"
-              >
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-gold text-lg font-bold text-gray-900">
-                  {index + 1}
-                </div>
-                <div>
-                  <h3 className="mb-1 text-xl font-bold">{item.title}</h3>
-                  <p className="text-sm leading-relaxed text-emerald-100">{item.text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA final */}
-      <section className="bg-slate-100 py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative flex flex-col items-center justify-between gap-8 overflow-hidden rounded-3xl bg-gradient-to-r from-congo to-emerald-800 p-8 text-white shadow-xl sm:p-12 md:flex-row">
-            <div className="pointer-events-none absolute -top-20 -right-20 size-64 rounded-full bg-gold/10 blur-3xl" />
-            <div className="z-10 space-y-2 text-center md:text-left">
-              <span className="text-xs font-bold tracking-widest text-gold uppercase">
-                Prêt à poser votre candidature ?
-              </span>
-              <h2 className="font-heading text-2xl font-bold sm:text-3xl">
-                Soumettez votre dossier en quelques minutes
-              </h2>
-              <p className="text-sm font-light text-emerald-100">
-                Assurez-vous d'avoir tous vos documents numérisés prêts à être téléversés.
+              <p className="section-kicker mb-5 text-yellow-300/90 before:hidden after:hidden">
+                PATN · CCIAMB · Banque mondiale (BIRD)
               </p>
+
+              <h1 className="max-w-3xl font-display text-4xl leading-[1.05] font-bold tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
+                <span className="text-white drop-shadow-lg">300 jeunes formés</span>
+                <br />
+                <span className="relative text-yellow-300 italic drop-shadow-md">
+                  aux métiers du numérique.
+                  <svg
+                    className="absolute -bottom-2 left-0 h-3 w-full text-yellow-400/60"
+                    viewBox="0 0 300 12"
+                    fill="none"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                  >
+                    <path d="M2 10C80 2 220 2 298 8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                  </svg>
+                </span>
+              </h1>
+
+              <p className="mt-8 max-w-2xl text-lg leading-relaxed font-light text-emerald-50/90 sm:text-xl">
+                Réseaux, connectivité et Cloud : bénéficiez d'une formation gratuite axée sur la pratique pour développer
+                vos compétences et préparer votre insertion professionnelle.
+              </p>
+
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <Link
+                  href="/candidature"
+                  className="btn-primary inline-flex items-center justify-center gap-3 rounded-2xl bg-yellow-400 px-8 py-4 font-extrabold text-slate-950 shadow-xl shadow-yellow-400/30 hover:-translate-y-1"
+                >
+                  <span>Déposer ma candidature</span>
+                  <span className="arrow text-lg">→</span>
+                </Link>
+                <a
+                  href="#eligibilite"
+                  className="glass inline-flex items-center justify-center rounded-2xl px-8 py-4 font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-white/20"
+                >
+                  Vérifier mon éligibilité
+                </a>
+              </div>
+
+              <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/15 pt-8 text-sm text-emerald-50/85">
+                {["Formation gratuite", "300 places disponibles", "Brazzaville et Pointe-Noire"].map((label) => (
+                  <span key={label} className="flex items-center gap-2.5">
+                    <span className="flex size-5 items-center justify-center rounded-full bg-yellow-400/20 text-yellow-300">
+                      <HugeiconsIcon icon={Tick02Icon} size={12} strokeWidth={3} />
+                    </span>
+                    {label}
+                  </span>
+                ))}
+              </div>
             </div>
-            <Button
-              asChild
-              size="lg"
-              className="z-10 h-12 shrink-0 rounded-xl bg-gold px-8 font-bold text-slate-900 shadow-lg transition-transform hover:scale-105 hover:bg-gold/90"
-            >
-              <Link href="/candidature">
-                Accéder au formulaire <ArrowRightIcon size={20} className="ml-1" />
-              </Link>
-            </Button>
+
+            <div className="reveal reveal-d2 lg:col-span-5">
+              <div className="hero-card-wrap">
+                <div className="glass-card relative overflow-hidden rounded-[2rem] p-8 shadow-2xl shadow-black/40 sm:p-9">
+                  <div className="absolute top-0 right-0 left-0 h-1.5 bg-gradient-to-r from-emerald-600 via-yellow-400 to-red-600" />
+                  <div className="absolute -top-16 -right-16 size-44 rounded-full bg-emerald-100/60 blur-2xl" />
+
+                  <div className="relative mb-7 flex items-center justify-between pt-1">
+                    <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3.5 py-1.5 text-[11px] font-extrabold tracking-wider text-congo uppercase">
+                      Formation PATN
+                    </span>
+                    <span className="text-congo-blue">
+                      <Glyph icon={CloudIcon} size={30} />
+                    </span>
+                  </div>
+
+                  <h2 className="relative font-display text-2xl leading-tight font-bold text-slate-900 sm:text-3xl">
+                    Construisez votre avenir dans le numérique.
+                  </h2>
+                  <p className="relative mt-3 text-sm leading-relaxed text-slate-500">
+                    Un parcours pratique organisé autour d'un socle commun et de deux spécialisations professionnelles.
+                  </p>
+
+                  <div className="relative mt-8 grid grid-cols-2 gap-3">
+                    <div className="group rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-4 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg">
+                      <div className="mb-3 flex size-10 items-center justify-center rounded-xl bg-emerald-100 text-congo transition-transform duration-300 group-hover:scale-110">
+                        <Glyph icon={Globe02Icon} size={22} />
+                      </div>
+                      <h3 className="text-sm font-extrabold text-congo">Réseaux & connectivité</h3>
+                      <p className="mt-2 text-xs leading-relaxed text-slate-500">Infrastructure, sécurité et administration réseau</p>
+                    </div>
+                    <div className="group rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-4 transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg">
+                      <div className="mb-3 flex size-10 items-center justify-center rounded-xl bg-blue-100 text-blue-700 transition-transform duration-300 group-hover:scale-110">
+                        <Glyph icon={CloudIcon} size={22} />
+                      </div>
+                      <h3 className="text-sm font-extrabold text-blue-800">Infrastructure Cloud</h3>
+                      <p className="mt-2 text-xs leading-relaxed text-slate-500">AWS, Azure, GCP et virtualisation</p>
+                    </div>
+                  </div>
+
+                  <div className="relative mt-7 rounded-xl bg-gradient-to-r from-congo to-congo-dark py-4 text-center text-sm font-bold tracking-wide text-white shadow-lg shadow-congo/25">
+                    Formation gratuite · 300 jeunes
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute right-0 bottom-0 left-0 h-1.5 bg-gradient-to-r from-emerald-700 via-yellow-400 to-red-600" />
+      </section>
+
+      {/* Repères clés */}
+      <section className="relative -mt-px bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+            {keyFigures.map((item, index) => (
+              <div
+                key={item.text}
+                className={`group lift scroll-reveal flex items-center gap-5 rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-white p-6 shadow-soft scroll-delay-${index + 1}`}
+              >
+                <span
+                  className={`flex size-16 items-center justify-center rounded-2xl border bg-gradient-to-br transition-transform duration-300 group-hover:rotate-3 group-hover:scale-110 ${item.tone}`}
+                >
+                  <Glyph icon={item.icon} size={30} />
+                </span>
+                <div>
+                  {item.title}
+                  <p className="mt-1.5 text-xs font-semibold text-slate-500">{item.text}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
-    </div>
+
+      {/* Présentation */}
+      <section id="presentation" className="relative bg-slate-50 py-24 sm:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(8,116,71,.06),transparent_60%)]" />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="scroll-reveal mx-auto mb-16 max-w-3xl text-center">
+            <span className="section-kicker text-congo">À propos du programme</span>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+              Présentation du projet
+            </h2>
+            <p className="mt-5 text-lg font-light text-slate-500">
+              Une initiative pour renforcer les compétences numériques des jeunes en République du Congo.
+            </p>
+          </div>
+
+          <div className="grid items-stretch gap-7 lg:grid-cols-12">
+            <article className="gradient-border scroll-reveal scroll-reveal-left p-8 shadow-card sm:p-12 lg:col-span-8">
+              <div className="mb-8 h-1.5 w-16 rounded-full bg-gradient-to-r from-congo to-yellow-400" />
+
+              <p className="mb-6 text-[15.5px] leading-8 text-slate-600 first-letter:float-left first-letter:mt-1 first-letter:mr-3 first-letter:font-display first-letter:text-6xl first-letter:leading-[.85] first-letter:font-bold first-letter:text-congo">
+                Dans le cadre du{" "}
+                <strong className="font-semibold text-slate-900">Projet d'Accélération de la Transformation Numérique (PATN)</strong>,
+                financé par la <strong className="font-semibold text-slate-900">Banque mondiale (BIRD)</strong>, la{" "}
+                <strong className="font-semibold text-slate-900">
+                  Chambre de Commerce, d'Industrie, d'Agriculture et des Métiers de Brazzaville (CCIAMB)
+                </strong>{" "}
+                assure la mise en œuvre d'un programme de formation de{" "}
+                <strong className="font-bold text-congo">300 jeunes</strong> en Réseaux, Connectivité et Cloud, dans les
+                villes de <strong className="font-semibold text-slate-900">Brazzaville et de Pointe-Noire</strong>.
+              </p>
+
+              <p className="mb-6 text-[15.5px] leading-8 text-slate-600">
+                Cette initiative vise à renforcer les compétences numériques des jeunes à travers un parcours de formation
+                axé sur la pratique, articulé autour d'un socle commun de connaissances et de deux spécialisations :{" "}
+                <strong className="font-semibold text-slate-900">Infrastructure Réseaux et Connectivité</strong> et{" "}
+                <strong className="font-semibold text-slate-900">Infrastructure Cloud</strong>.
+              </p>
+
+              <p className="rounded-r-xl border-l-4 border-yellow-400 bg-gradient-to-r from-yellow-50/70 to-transparent py-3 pl-5 text-[15.5px] leading-8 text-slate-600">
+                Le projet ambitionne de faciliter l'accès aux certifications professionnelles internationales, de favoriser
+                l'insertion sur le marché du travail et de stimuler l'entrepreneuriat numérique. À travers cette initiative,
+                le PATN contribue au développement des compétences numériques et à l'accélération de la transformation
+                numérique en République du Congo.
+              </p>
+            </article>
+
+            <aside className="scroll-reveal scroll-reveal-right grid grid-cols-2 gap-5 lg:col-span-4 lg:grid-cols-1">
+              <div className="group relative flex flex-col justify-center overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-congo-dark to-congo p-7 text-white shadow-card">
+                <div className="absolute -top-8 -right-8 size-36 rounded-full bg-white/10 transition-transform duration-500 group-hover:scale-125" />
+                <div className="absolute -bottom-10 -left-10 size-32 rounded-full bg-yellow-400/10 transition-transform duration-500 group-hover:scale-125" />
+                <p className="relative text-sm font-semibold text-emerald-200">Bénéficiaires</p>
+                <p className="shimmer relative mt-3 text-7xl font-black tracking-tight text-yellow-300">300</p>
+                <p className="relative mt-1 text-emerald-100">jeunes à former</p>
+              </div>
+
+              <div className="group relative flex flex-col justify-center overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-blue-950 to-blue-800 p-7 text-white shadow-card">
+                <div className="absolute -top-8 -right-8 size-36 rounded-full bg-white/10 transition-transform duration-500 group-hover:scale-125" />
+                <p className="relative text-sm font-semibold text-blue-200">Lieux de formation</p>
+                <p className="relative mt-4 font-display text-2xl font-bold">Brazzaville</p>
+                <div className="relative my-3 h-px bg-gradient-to-r from-white/30 to-transparent" />
+                <p className="relative font-display text-2xl font-bold">Pointe-Noire</p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      {/* Spécialisations */}
+      <section className="bg-white py-24 sm:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="scroll-reveal mb-16 text-center">
+            <span className="section-kicker text-congo">Parcours de formation</span>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+              Deux spécialisations au choix
+            </h2>
+          </div>
+
+          <div className="grid gap-7 md:grid-cols-2">
+            <article className="lift group scroll-reveal scroll-reveal-left relative overflow-hidden rounded-[1.75rem] border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-white p-9 shadow-card sm:p-11">
+              <div className="absolute top-0 right-0 size-48 rounded-full bg-emerald-100/50 blur-3xl transition-colors duration-500 group-hover:bg-emerald-200/50" />
+              <span className="absolute top-2 right-6 font-display text-[7rem] leading-none font-bold text-emerald-900/5 select-none">01</span>
+              <div className="relative">
+                <div className="flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-congo to-congo-dark text-white shadow-lg shadow-congo/25 transition-all duration-300 group-hover:-rotate-3 group-hover:scale-110">
+                  <Glyph icon={Globe02Icon} size={30} />
+                </div>
+                <p className="mt-8 text-[11px] font-extrabold tracking-[.2em] text-congo uppercase">Spécialisation 01</p>
+                <h3 className="mt-2 font-display text-2xl leading-snug font-bold text-slate-900 sm:text-[1.7rem]">
+                  Infrastructure Réseaux et Connectivité
+                </h3>
+                <p className="mt-4 text-[15px] leading-relaxed text-slate-600">
+                  Développez des compétences en infrastructure réseau, connectivité, sécurité et administration des réseaux.
+                </p>
+                <div className="mt-7 flex flex-wrap gap-2">
+                  {["Infrastructure", "Sécurité", "Administration réseau"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition-colors hover:border-congo hover:bg-congo hover:text-white"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </article>
+
+            <article className="lift group scroll-reveal scroll-reveal-right relative overflow-hidden rounded-[1.75rem] border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-white p-9 shadow-card sm:p-11">
+              <div className="absolute top-0 right-0 size-48 rounded-full bg-blue-100/50 blur-3xl transition-colors duration-500 group-hover:bg-blue-200/50" />
+              <span className="absolute top-2 right-6 font-display text-[7rem] leading-none font-bold text-blue-900/5 select-none">02</span>
+              <div className="relative">
+                <div className="flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-700 to-blue-900 text-white shadow-lg shadow-blue-700/25 transition-all duration-300 group-hover:-rotate-3 group-hover:scale-110">
+                  <Glyph icon={CloudIcon} size={30} />
+                </div>
+                <p className="mt-8 text-[11px] font-extrabold tracking-[.2em] text-blue-700 uppercase">Spécialisation 02</p>
+                <h3 className="mt-2 font-display text-2xl leading-snug font-bold text-slate-900 sm:text-[1.7rem]">Infrastructure Cloud</h3>
+                <p className="mt-4 text-[15px] leading-relaxed text-slate-600">
+                  Découvrez les environnements Cloud, notamment AWS, Azure, GCP et les technologies de virtualisation.
+                </p>
+                <div className="mt-7 flex flex-wrap gap-2">
+                  {["AWS", "Azure", "GCP", "Virtualisation"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-blue-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-blue-800 shadow-sm transition-colors hover:border-blue-700 hover:bg-blue-700 hover:text-white"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div className="scroll-reveal mt-8 flex items-start gap-5 rounded-2xl border border-yellow-200 bg-gradient-to-r from-yellow-50 to-amber-50 p-6 shadow-soft sm:p-7">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-yellow-400 text-slate-900 shadow-md shadow-yellow-400/30">
+              <Glyph icon={Award01Icon} size={24} />
+            </span>
+            <p className="pt-1 text-sm leading-relaxed text-slate-700 sm:text-[15px]">
+              Le projet ambitionne de faciliter l'accès aux{" "}
+              <strong className="text-slate-900">certifications professionnelles internationales</strong>, de favoriser
+              l'insertion sur le marché du travail et de stimuler l'entrepreneuriat numérique.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Éligibilité */}
+      <section id="eligibilite" className="relative bg-slate-50 py-24 sm:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(7,84,166,.05),transparent_60%)]" />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="scroll-reveal mx-auto mb-16 max-w-3xl text-center">
+            <span className="section-kicker text-congo">Préparez votre dossier</span>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+              Êtes-vous éligible ?
+            </h2>
+            <p className="mt-5 text-lg font-light text-slate-500">
+              Consultez les conditions de participation et les documents à fournir avant de postuler.
+            </p>
+          </div>
+
+          <div className="grid items-stretch gap-7 lg:grid-cols-2">
+            <div className="scroll-reveal scroll-reveal-left flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-emerald-100 bg-white shadow-card">
+              <div className="relative shrink-0 overflow-hidden bg-gradient-to-br from-congo to-congo-dark p-7 text-white sm:p-8">
+                <div className="card-orb-a absolute -top-10 -right-10 size-44 rounded-full bg-white/10" />
+                <div className="card-orb-b absolute -bottom-14 right-16 size-32 rounded-full bg-yellow-400/15" />
+                <CardNetwork points={[[20, 30], [110, 80], [190, 25], [270, 70], [150, 110]]} />
+                <div className="card-sweep" />
+                <div className="relative flex items-center gap-4">
+                  <span className="flex size-[3.25rem] items-center justify-center rounded-xl bg-white/20 shadow-sm backdrop-blur">
+                    <Glyph icon={Tick02Icon} size={26} />
+                  </span>
+                  <div>
+                    <p className="text-[11px] font-bold tracking-[.18em] text-emerald-100 uppercase">Conditions de candidature</p>
+                    <h3 className="mt-1 font-display text-2xl font-bold">Critères d'éligibilité</h3>
+                  </div>
+                </div>
+              </div>
+
+              <ol className="grow space-y-2 p-7 sm:p-8">
+                {criteria.map((item, index) => (
+                  <li key={index} className="check-item group flex items-start gap-4">
+                    <span className="number-dot flex shrink-0 items-center justify-center rounded-full bg-emerald-100 font-extrabold text-congo transition-colors duration-300 group-hover:bg-congo group-hover:text-white">
+                      {index + 1}
+                    </span>
+                    <span className="pt-1.5 text-[15px] leading-relaxed text-slate-600">{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            <div className="scroll-reveal scroll-reveal-right flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-blue-100 bg-white shadow-card">
+              <div className="relative shrink-0 overflow-hidden bg-gradient-to-br from-blue-600 to-blue-900 p-7 text-white sm:p-8">
+                <div className="card-orb-a absolute -top-10 -right-10 size-44 rounded-full bg-white/10" />
+                <div className="card-orb-b absolute -bottom-14 right-16 size-32 rounded-full bg-sky-300/15" />
+                <CardNetwork points={[[20, 85], [100, 35], [185, 90], [275, 40], [140, 8]]} />
+                <div className="card-sweep" style={{ animationDelay: "-3s" }} />
+                <div className="relative flex items-center gap-4">
+                  <span className="flex size-[3.25rem] items-center justify-center rounded-xl bg-white/20 shadow-sm backdrop-blur">
+                    <Glyph icon={File02Icon} size={26} />
+                  </span>
+                  <div>
+                    <p className="text-[11px] font-bold tracking-[.18em] text-blue-100 uppercase">Constitution du dossier</p>
+                    <h3 className="mt-1 font-display text-2xl font-bold">Pièces à fournir</h3>
+                  </div>
+                </div>
+              </div>
+
+              <ol className="grow space-y-2 p-7 sm:p-8">
+                {documents.map((item, index) => (
+                  <li key={index} className="check-item blue group flex items-start gap-4">
+                    <span className="number-dot flex shrink-0 items-center justify-center rounded-full bg-blue-100 font-extrabold text-blue-800 transition-colors duration-300 group-hover:bg-blue-600 group-hover:text-white">
+                      {index + 1}
+                    </span>
+                    <span className="pt-1.5 text-[15px] leading-relaxed text-slate-600">{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Calendrier et contacts */}
+      <section className="bg-white py-24 sm:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="scroll-reveal mb-16 text-center">
+            <span className="section-kicker text-congo">Toutes les informations utiles</span>
+            <h2 className="mt-5 font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+              Calendrier et contacts
+            </h2>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <article className="lift group scroll-reveal scroll-delay-1 relative overflow-hidden rounded-2xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50/50 p-8 shadow-soft">
+              <div className="absolute -top-10 -right-10 size-36 rounded-full bg-yellow-200/40 blur-2xl" />
+              <div className="relative flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-500 text-slate-900 shadow-md shadow-yellow-400/30 transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-110">
+                <Glyph icon={Calendar03Icon} size={26} />
+              </div>
+              <p className="relative mt-6 text-[11px] font-extrabold tracking-[.16em] text-yellow-800 uppercase">
+                Période de l'appel à candidature
+              </p>
+              <p className="relative mt-3 text-lg leading-snug font-semibold text-slate-900">Du 23 Novembre 2026</p>
+              <p className="relative mt-1 text-lg leading-snug font-semibold text-slate-900">Au 6 Décembre 2026</p>
+            </article>
+
+            <article className="lift group scroll-reveal scroll-delay-2 relative overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-green-50/50 p-8 shadow-soft">
+              <div className="absolute -top-10 -right-10 size-36 rounded-full bg-emerald-200/40 blur-2xl" />
+              <div className="relative flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-congo to-congo-dark text-white shadow-md shadow-congo/30 transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-110">
+                <Glyph icon={Location01Icon} size={26} />
+              </div>
+              <p className="relative mt-6 text-[11px] font-extrabold tracking-[.16em] text-congo uppercase">Lieux de formation</p>
+              <p className="relative mt-3 text-lg leading-snug font-semibold text-slate-900">Brazzaville</p>
+              <p className="relative mt-1 text-lg leading-snug font-semibold text-slate-900">Pointe-Noire</p>
+            </article>
+
+            <article className="lift group scroll-reveal scroll-delay-3 relative overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50/50 p-8 shadow-soft">
+              <div className="absolute -top-10 -right-10 size-36 rounded-full bg-blue-200/40 blur-2xl" />
+              <div className="relative flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-700 to-blue-900 text-white shadow-md shadow-blue-700/30 transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-110">
+                <Glyph icon={Call02Icon} size={26} />
+              </div>
+              <p className="relative mt-6 text-[11px] font-extrabold tracking-[.16em] text-blue-800 uppercase">Pour plus d'informations</p>
+              <a href="tel:+242068953275" className="relative mt-3 block text-lg leading-snug font-semibold text-slate-900 transition-colors hover:text-blue-800">
+                +242 06 895 32 75
+              </a>
+              <a href="tel:+242057458942" className="relative mt-1 block text-lg leading-snug font-semibold text-slate-900 transition-colors hover:text-blue-800">
+                +242 05 745 89 42
+              </a>
+              <a
+                href="mailto:formationpatn@cciamb-cnia.cg"
+                className="relative mt-4 block text-sm font-medium break-all text-blue-800 underline-offset-2 hover:underline"
+              >
+                formationpatn@cciamb-cnia.cg
+              </a>
+            </article>
+          </div>
+
+          <div className="scroll-reveal mt-6 flex flex-col gap-5 rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 to-white p-6 shadow-soft transition-colors hover:border-emerald-200 sm:flex-row sm:items-center sm:p-7">
+            <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 shadow-sm">
+              <Glyph icon={Location01Icon} size={26} />
+            </span>
+            <div>
+              <p className="text-[11px] font-extrabold tracking-[.16em] text-slate-500 uppercase">Adresse</p>
+              <p className="mt-1 text-[15px] font-bold text-slate-900">92 Avenue Amilcar CABRAL, Centre-ville, Brazzaville</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Appel à l'action final */}
+      <section className="bg-white pb-24 sm:pb-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="cta-banner scroll-reveal scroll-reveal-zoom relative overflow-hidden rounded-[2rem] p-9 text-white sm:p-12 lg:p-16">
+            <div className="pointer-events-none absolute -top-16 -right-16 size-72 rounded-full border-[32px] border-white/10" />
+            <div className="pointer-events-none absolute -bottom-16 -left-16 size-72 rounded-full border-[32px] border-yellow-400/20" />
+            <div className="hero-grid pointer-events-none absolute inset-0 opacity-60" />
+
+            <div className="relative z-10 flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-2xl">
+                <p className="text-[11px] font-extrabold tracking-[.2em] text-yellow-300 uppercase">
+                  Votre avenir dans le numérique commence ici
+                </p>
+                <h2 className="mt-4 font-display text-3xl leading-tight font-bold text-white drop-shadow-sm sm:text-4xl lg:text-[2.6rem]">
+                  Rejoignez les 300 jeunes bénéficiaires du PATN
+                </h2>
+                <p className="mt-4 text-lg font-light text-emerald-50">Préparez vos pièces et soumettez votre dossier en ligne.</p>
+              </div>
+
+              <Link
+                href="/candidature"
+                className="btn-primary inline-flex shrink-0 items-center justify-center gap-3 rounded-2xl bg-yellow-400 px-8 py-4 font-extrabold text-slate-950 shadow-xl shadow-yellow-400/30 hover:-translate-y-1"
+              >
+                <span>Accéder au formulaire</span>
+                <span className="arrow text-lg">→</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   )
 }

@@ -1,5 +1,6 @@
 import { getAdmin } from "@/lib/auth"
 import { fetchAllCandidates } from "@/lib/candidates"
+import { formatDateOnly, formatDateTime } from "@/lib/format"
 
 const quote = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`
 
@@ -9,16 +10,34 @@ export async function GET() {
   }
 
   const rows = await fetchAllCandidates()
-  const headers = ["Code référence", "Date dépôt", "Nom complet", "Email", "Téléphone", "Ville", "Adresse"]
+  const headers = [
+    "Code référence",
+    "Date dépôt",
+    "Nom complet",
+    "Email",
+    "Téléphone",
+    "Ville",
+    "Adresse",
+    "Date naissance",
+    "Lieu naissance",
+    "Type BAC",
+    "Année obtention",
+    "Spécialité",
+  ]
   const lines = rows.map((r) =>
     [
       r.ref,
-      new Date(r.created_at).toLocaleString("fr-FR", { timeZone: "Africa/Brazzaville" }),
+      formatDateTime(r.created_at),
       r.full_name,
       r.email,
       r.phone,
       r.city,
       r.address,
+      formatDateOnly(r.date_of_birth),
+      r.place_of_birth,
+      r.bac_type,
+      r.bac_year,
+      r.specialty,
     ]
       .map(quote)
       .join(";")

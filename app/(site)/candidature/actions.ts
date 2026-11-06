@@ -19,6 +19,7 @@ const BUCKET = "documents"
 const prepareSchema = z.object({
   applicant: applicantSchema,
   files: z.object({
+    photo: fileMetaSchema.nullable(),
     identity: fileMetaSchema,
     diploma: fileMetaSchema,
     cv: fileMetaSchema,
@@ -30,6 +31,7 @@ const finalizeSchema = z.object({
   ref: z.string().regex(REF_PATTERN),
   applicant: applicantSchema,
   paths: z.object({
+    photo: z.string().nullable(),
     identity: z.string(),
     diploma: z.string(),
     cv: z.string(),
@@ -37,12 +39,10 @@ const finalizeSchema = z.object({
   }),
 })
 
+type Uploads = Partial<Record<DocumentKind, { path: string; token: string }>>
+
 export type PrepareResult =
-  | {
-      ok: true
-      ref: string
-      uploads: Record<DocumentKind, { path: string; token: string }>
-    }
+  | { ok: true; ref: string; uploads: Uploads }
   | { ok: false; error: string }
 
 export type FinalizeResult = { ok: true; reference: string } | { ok: false; error: string }
@@ -93,9 +93,11 @@ export async function prepareApplication(input: unknown): Promise<PrepareResult>
   }
   if (!ref) return { ok: false, error: "Impossible de générer une référence. Réessayez." }
 
-  const uploads = {} as Record<DocumentKind, { path: string; token: string }>
+  const uploads: Uploads = {}
   for (const kind of DOCUMENT_KINDS) {
-    const extension = MIME_EXTENSIONS[files[kind].type]
+    const file = files[kind]
+    if (!file) continue // photo facultative
+    const extension = MIME_EXTENSIONS[file.type]
     const path = `${ref}/${kind}-${randomBytes(8).toString("hex")}.${extension}`
     const { data, error } = await admin.storage.from(BUCKET).createSignedUploadUrl(path)
     if (error || !data) return { ok: false, error: "Impossible de préparer l'envoi des fichiers." }
@@ -117,7 +119,7 @@ export async function finalizeApplication(input: unknown): Promise<FinalizeResul
 
   const admin = createAdminClient()
   const storage = admin.storage.from(BUCKET)
-  const allPaths = DOCUMENT_KINDS.map((kind) => paths[kind])
+  const allPaths = DOCUMENT_KINDS.map((kind) => paths[kind]).filter((path): path is string => Boolean(path))
 
   const discard = () => storage.remove(allPaths)
 
@@ -127,6 +129,7 @@ export async function finalizeApplication(input: unknown): Promise<FinalizeResul
 
   for (const kind of DOCUMENT_KINDS) {
     const path = paths[kind]
+    if (!path) continue // photo facultative
     const pattern = new RegExp(`^${ref}/${kind}-[a-f0-9]{16}\\.(pdf|jpg|png)$`)
     const object = pattern.test(path) ? byName.get(path.slice(ref.length + 1)) : undefined
     if (!object) {
@@ -148,6 +151,12 @@ export async function finalizeApplication(input: unknown): Promise<FinalizeResul
     phone: applicant.phone,
     city: applicant.city,
     address: applicant.address,
+    date_of_birth: applicant.dateOfBirth,
+    place_of_birth: applicant.placeOfBirth,
+    bac_type: applicant.bacType,
+    bac_year: Number(applicant.bacYear),
+    specialty: applicant.specialty,
+    photo_file: paths.photo,
     id_file: paths.identity,
     diploma_file: paths.diploma,
     cv_file: paths.cv,

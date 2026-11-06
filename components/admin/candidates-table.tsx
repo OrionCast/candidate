@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { getCandidateDocuments, type DocumentUrls } from "@/app/admin/actions"
+import { DownloadButton } from "@/components/admin/download-button"
 import { FileTextIcon, SearchIcon } from "@/components/site/icons"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -11,19 +12,28 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import type { CandidateRow } from "@/lib/candidates"
-import { DOCUMENT_KINDS, DOCUMENT_RULES, type DocumentKind } from "@/lib/validation"
+import { formatDateOnly, formatDateTime } from "@/lib/format"
+import { DOCUMENT_RULES, REQUIRED_DOCUMENTS, type DocumentKind } from "@/lib/validation"
 
 const ALL = "all"
 
-// Fuseau fixe : évite tout décalage entre le rendu serveur et le navigateur.
-const dateFormat = new Intl.DateTimeFormat("fr-FR", {
-  dateStyle: "short",
-  timeStyle: "short",
-  timeZone: "Africa/Brazzaville",
-})
-
 // Documents affichables dans un cadre (la pièce d'identité peut être une image).
 const PREVIEWABLE: DocumentKind[] = ["diploma", "cv", "motivation"]
+
+function Avatar({ url, name, className }: { url: string | null; name: string; className?: string }) {
+  if (!url) {
+    return (
+      <span
+        aria-hidden="true"
+        className={`inline-flex size-10 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-400 ${className ?? ""}`}
+      >
+        {name.trim().charAt(0).toUpperCase() || "-"}
+      </span>
+    )
+  }
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={url} alt="" className={`size-10 rounded-full border border-slate-200 object-cover ${className ?? ""}`} />
+}
 
 type Docs =
   | { status: "loading" }
@@ -47,7 +57,9 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
     return candidates.filter(
       (c) =>
         (city === ALL || c.city === city) &&
-        [c.ref, c.full_name, c.phone].some((v) => v.toLowerCase().includes(q))
+        [c.ref, c.full_name, c.phone, c.email, c.bac_type, c.bac_year, c.specialty].some((v) =>
+          String(v ?? "").toLowerCase().includes(q)
+        )
     )
   }, [candidates, query, city])
 
@@ -75,7 +87,7 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rechercher nom, téléphone, réf…"
+              placeholder="Rechercher nom, téléphone, réf, BAC…"
               aria-label="Rechercher une candidature"
               className="h-10 rounded-lg bg-white pl-10"
             />
@@ -99,8 +111,21 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
       <Table>
         <TableHeader className="bg-slate-50">
           <TableRow>
-            {["Code réf.", "Date de dépôt", "Nom complet", "Téléphone", "Ville", "Documents"].map((label) => (
-              <TableHead key={label} className="px-5 text-xs font-semibold tracking-wider text-slate-500 uppercase">
+            {[
+              "Photo",
+              "Code réf.",
+              "Date de dépôt",
+              "Nom complet",
+              "Téléphone",
+              "Ville",
+              "Date naiss.",
+              "Lieu naiss.",
+              "BAC",
+              "Année",
+              "Spécialité",
+              "Documents",
+            ].map((label) => (
+              <TableHead key={label} className="px-5 text-xs font-semibold tracking-wider whitespace-nowrap text-slate-500 uppercase">
                 {label}
               </TableHead>
             ))}
@@ -110,11 +135,19 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
         <TableBody>
           {filtered.map((c) => (
             <TableRow key={c.id}>
-              <TableCell className="px-5 font-bold">{c.ref}</TableCell>
-              <TableCell className="px-5">{dateFormat.format(new Date(c.created_at))}</TableCell>
+              <TableCell className="px-5">
+                <Avatar url={c.photo_url} name={c.full_name} />
+              </TableCell>
+              <TableCell className="px-5 font-bold whitespace-nowrap">{c.ref}</TableCell>
+              <TableCell className="px-5 whitespace-nowrap">{formatDateTime(c.created_at)}</TableCell>
               <TableCell className="px-5">{c.full_name}</TableCell>
-              <TableCell className="px-5">{c.phone}</TableCell>
+              <TableCell className="px-5 whitespace-nowrap">{c.phone}</TableCell>
               <TableCell className="px-5">{c.city}</TableCell>
+              <TableCell className="px-5 whitespace-nowrap">{formatDateOnly(c.date_of_birth)}</TableCell>
+              <TableCell className="px-5">{c.place_of_birth || "—"}</TableCell>
+              <TableCell className="px-5">{c.bac_type || "—"}</TableCell>
+              <TableCell className="px-5">{c.bac_year ?? "—"}</TableCell>
+              <TableCell className="px-5">{c.specialty || "—"}</TableCell>
               <TableCell className="px-5">
                 <span className="flex flex-wrap gap-1">
                   <Badge variant="secondary" className="bg-slate-100 text-slate-600">CNI</Badge>
@@ -123,10 +156,21 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
                   <Badge variant="secondary">Motiv.</Badge>
                 </span>
               </TableCell>
-              <TableCell className="px-5 text-right">
-                <Button size="sm" variant="outline" className="rounded-lg" onClick={() => openPreview(c)}>
-                  Aperçu
-                </Button>
+              <TableCell className="px-5">
+                <div className="flex items-center justify-end gap-1.5">
+                  <Button size="sm" variant="outline" className="rounded-lg" onClick={() => openPreview(c)}>
+                    Aperçu
+                  </Button>
+                  <DownloadButton
+                    href={`/admin/candidates/${c.id}/zip`}
+                    fallbackName={`${c.ref}.zip`}
+                    label="ZIP"
+                    busyLabel="ZIP…"
+                    size="sm"
+                    variant="default"
+                    className="h-8 gap-1.5 rounded-lg px-3"
+                  />
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -150,18 +194,26 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
           {selected && (
             <>
               <DialogHeader>
-                <DialogTitle className="pr-10 text-xl font-bold text-slate-800">
-                  Dossier de {selected.full_name} — {selected.ref}
-                </DialogTitle>
+                <div className="flex items-center gap-4 pr-10">
+                  <Avatar url={selected.photo_url} name={selected.full_name} className="size-20 text-2xl shadow-sm" />
+                  <DialogTitle className="text-xl font-bold text-slate-800">
+                    Dossier de {selected.full_name} — {selected.ref}
+                  </DialogTitle>
+                </div>
               </DialogHeader>
 
               <div className="grid gap-3 text-sm sm:grid-cols-2">
                 {[
                   ["Téléphone", selected.phone],
                   ["Email", selected.email || "Non renseigné"],
+                  ["Date de naissance", selected.date_of_birth ? formatDateOnly(selected.date_of_birth) : "Non renseignée"],
+                  ["Lieu de naissance", selected.place_of_birth || "Non renseigné"],
+                  ["Type de BAC", selected.bac_type || "Non renseigné"],
+                  ["Année d'obtention", selected.bac_year ? String(selected.bac_year) : "Non renseignée"],
+                  ["Spécialité", selected.specialty || "Non renseignée"],
                   ["Ville", selected.city],
                   ["Adresse", selected.address || "Non renseignée"],
-                  ["Date de dépôt", dateFormat.format(new Date(selected.created_at))],
+                  ["Date de dépôt", formatDateTime(selected.created_at)],
                 ].map(([label, value]) => (
                   <p key={label}>
                     <strong>{label} :</strong> {value}
@@ -171,7 +223,7 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
 
               {docs.status === "loading" && (
                 <div role="status" aria-label="Chargement des documents" className="space-y-4">
-                  {DOCUMENT_KINDS.map((kind) => (
+                  {REQUIRED_DOCUMENTS.map((kind) => (
                     <div key={kind} className="space-y-2">
                       <Skeleton className="h-5 w-40" />
                       <Skeleton className="h-4 w-64" />
@@ -181,7 +233,7 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
               )}
               {docs.status === "error" && <p className="text-sm text-flag-red">{docs.message}</p>}
               {docs.status === "ready" &&
-                DOCUMENT_KINDS.map((kind) => {
+                REQUIRED_DOCUMENTS.map((kind) => {
                   const url = docs.urls[kind]
                   return (
                     <div key={kind} className="space-y-2">

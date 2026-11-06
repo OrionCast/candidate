@@ -33,7 +33,7 @@ export function NewsList() {
 
   return (
     <>
-      <section className="sticky top-16 z-20 border-b border-congo-line bg-white/95 py-5 shadow-sm backdrop-blur">
+      <section className="sticky top-24 z-20 sm:top-28 border-b border-congo-line bg-white/95 py-5 shadow-sm backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
           <div className="flex flex-wrap items-center gap-2">
             {[null, ...NEWS_CATEGORIES].map((name) => (

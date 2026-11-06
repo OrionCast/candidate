@@ -30,7 +30,7 @@ export function ResultsForm({ initialContent, hasPdf }: { initialContent: string
 
       if (file instanceof File && file.size > 0) {
         if (file.type !== "application/pdf" || file.size > MAX_FILE_SIZE) {
-          return setStatus({ text: "Le document doit être un PDF de 5 Mo maximum.", error: true })
+          return setStatus({ text: "Le document doit être un PDF de 30 Mo maximum.", error: true })
         }
         const prepared = await prepareResultsUpload({ type: file.type, size: file.size })
         if (!prepared.ok) return setStatus({ text: prepared.error, error: true })
@@ -86,7 +86,7 @@ export function ResultsForm({ initialContent, hasPdf }: { initialContent: string
 
         <div className="space-y-2">
           <Label htmlFor="results" className="font-semibold text-slate-700">
-            Document officiel PDF <span className="font-normal text-slate-400">(facultatif, max. 5 Mo)</span>
+            Document officiel PDF <span className="font-normal text-slate-400">(facultatif, max. 30 Mo)</span>
           </Label>
           <Input
             id="results"

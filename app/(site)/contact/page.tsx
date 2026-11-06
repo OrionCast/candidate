@@ -38,9 +38,9 @@ export default function ContactPage() {
   return (
     <>
       <PageHero
-        eyebrow="Contact"
-        title="Nous contacter"
-        description="Une question sur la procédure ? Écrivez au service chargé des candidatures."
+        eyebrow="Nous sommes à votre écoute"
+        title="Comment pouvons-nous vous aider ?"
+        description="Consultez les informations utiles ou préparez un message à destination du service chargé des candidatures."
         current="Contact"
       />
 

@@ -6,6 +6,7 @@ Les migrations de `migrations/` sont à exécuter dans l'ordre (SQL Editor du ta
 2. `..._rls.sql` : Row Level Security
 3. `..._storage.sql` : buckets `documents` (privé) et `results` (public)
 4. `..._cities.sql` : table `cities` (villes du formulaire, gérées depuis l'admin) avec Brazzaville et Pointe-Noire
+5. `..._applicant_profile.sql` : date et lieu de naissance, BAC, spécialité, photo de profil ; fichiers limités à 30 Mo
 
 ## Donner le rôle admin à un compte
 

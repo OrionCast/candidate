@@ -23,7 +23,7 @@ export async function logout() {
 
 export type DocumentUrls = Record<DocumentKind, string | null>
 
-/** URLs signées (5 min) des 4 documents d'un candidat, pour l'aperçu admin. */
+/** URLs signées (5 min) des documents d'un candidat, pour l'aperçu admin. */
 export async function getCandidateDocuments(
   candidateId: string
 ): Promise<{ ok: true; urls: DocumentUrls } | { ok: false; error: string }> {
@@ -33,12 +33,13 @@ export async function getCandidateDocuments(
   const supabase = await createClient()
   const { data: row } = await supabase
     .from("candidates")
-    .select("id_file, diploma_file, cv_file, motivation_file")
+    .select("photo_file, id_file, diploma_file, cv_file, motivation_file")
     .eq("id", candidateId)
     .maybeSingle()
   if (!row) return { ok: false, error: "Dossier introuvable." }
 
-  const files: Record<DocumentKind, string> = {
+  const files: Record<DocumentKind, string | null> = {
+    photo: row.photo_file,
     identity: row.id_file,
     diploma: row.diploma_file,
     cv: row.cv_file,
@@ -47,7 +48,12 @@ export async function getCandidateDocuments(
 
   const urls = {} as DocumentUrls
   for (const kind of DOCUMENT_KINDS) {
-    const { data } = await supabase.storage.from("documents").createSignedUrl(files[kind], 300)
+    const path = files[kind]
+    if (!path) {
+      urls[kind] = null
+      continue
+    }
+    const { data } = await supabase.storage.from("documents").createSignedUrl(path, 300)
     urls[kind] = data?.signedUrl ?? null
   }
   return { ok: true, urls }
@@ -55,7 +61,7 @@ export async function getCandidateDocuments(
 
 const resultsFileSchema = z.object({
   type: z.literal("application/pdf", "Le document doit être un PDF."),
-  size: z.number().int().positive().max(MAX_FILE_SIZE, "Le PDF dépasse 5 Mo."),
+  size: z.number().int().positive().max(MAX_FILE_SIZE, "Le PDF dépasse 30 Mo."),
 })
 
 export async function prepareResultsUpload(

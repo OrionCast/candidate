@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import { CandidatesTable } from "@/components/admin/candidates-table"
 import { CitiesCard, type CityRow } from "@/components/admin/cities-card"
 import { DashboardSkeleton } from "@/components/admin/dashboard-skeleton"
-import { ExportButton } from "@/components/admin/export-button"
+import { DownloadButton } from "@/components/admin/download-button"
 import { LogoutButton } from "@/components/admin/logout-button"
 import { ResultsForm } from "@/components/admin/results-form"
 import { FileTextIcon, MapPinIcon } from "@/components/site/icons"
@@ -55,7 +55,7 @@ async function Dashboard() {
           <p className="mt-1 text-sm text-slate-500 sm:text-base">Suivi et consultation des dossiers reçus.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <ExportButton />
+          <DownloadButton href="/admin/export" fallbackName="candidatures.csv" label="Exporter en CSV" busyLabel="Export en cours…" />
           <LogoutButton />
         </div>
       </div>

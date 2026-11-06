@@ -15,6 +15,7 @@ const checklist = [
   "Vos coordonnées sont exactes",
   "Votre pièce d'identité est lisible",
   "Votre diplôme est au format PDF",
+  "Votre photo de profil est au format JPG ou PNG (facultatif)",
   "CV et lettre de motivation prêts",
 ]
 
@@ -60,7 +61,7 @@ export default function ApplyPage() {
               <div className="mb-5 rounded-lg border border-gold-line bg-gold-soft p-4">
                 <p className="mb-1 text-[11px] font-bold tracking-wider text-amber-800 uppercase">À savoir</p>
                 <p className="text-sm leading-relaxed text-amber-900">
-                  Les fichiers doivent peser <strong>5 Mo maximum</strong> chacun. Après l'envoi, conservez votre
+                  Les documents doivent peser <strong>30 Mo maximum</strong> chacun (2 Mo pour la photo). Après l'envoi, conservez votre
                   code de référence.
                 </p>
               </div>
