@@ -1,7 +1,8 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useTransition } from "react"
 import { getCandidateDocuments, type DocumentUrls } from "@/app/admin/actions"
+import { setCandidateStatus } from "@/app/admin/content-actions"
 import { DownloadButton } from "@/components/admin/download-button"
 import { FileTextIcon, SearchIcon } from "@/components/site/icons"
 import { Badge } from "@/components/ui/badge"
@@ -9,8 +10,16 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Spinner } from "@/components/ui/spinner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  CANDIDATE_STATUSES,
+  STATUS_LABEL,
+  STATUS_TONE,
+  isCandidateStatus,
+  type CandidateStatus,
+} from "@/lib/candidate-status"
 import type { CandidateRow } from "@/lib/candidates"
 import { formatDateOnly, formatDateTime } from "@/lib/format"
 import { DOCUMENT_RULES, REQUIRED_DOCUMENTS, type DocumentKind } from "@/lib/validation"
@@ -35,6 +44,42 @@ function Avatar({ url, name, className }: { url: string | null; name: string; cl
   return <img src={url} alt="" className={`size-10 rounded-full border border-slate-200 object-cover ${className ?? ""}`} />
 }
 
+/** Changement de statut en un clic, directement dans la ligne du tableau. */
+function StatusSelect({ candidate }: { candidate: CandidateRow }) {
+  const [pending, startTransition] = useTransition()
+
+  return (
+    <div className="flex items-center gap-1.5">
+      {pending && <Spinner />}
+      <Select
+        value={candidate.status}
+        disabled={pending}
+        onValueChange={(value) => {
+          if (!isCandidateStatus(value)) return
+          startTransition(async () => {
+            await setCandidateStatus(candidate.id, value)
+          })
+        }}
+      >
+        <SelectTrigger
+          aria-label={`Statut de ${candidate.full_name}`}
+          size="sm"
+          className={`h-8 rounded-full border-0 px-3 text-xs font-semibold ${STATUS_TONE[candidate.status]}`}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {CANDIDATE_STATUSES.map((status) => (
+            <SelectItem key={status} value={status}>
+              {STATUS_LABEL[status]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  )
+}
+
 type Docs =
   | { status: "loading" }
   | { status: "error"; message: string }
@@ -43,6 +88,7 @@ type Docs =
 export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) {
   const [query, setQuery] = useState("")
   const [city, setCity] = useState(ALL)
+  const [statusFilter, setStatusFilter] = useState<CandidateStatus | typeof ALL>(ALL)
   const [selected, setSelected] = useState<CandidateRow | null>(null)
   const [docs, setDocs] = useState<Docs>({ status: "loading" })
 
@@ -57,11 +103,18 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
     return candidates.filter(
       (c) =>
         (city === ALL || c.city === city) &&
+        (statusFilter === ALL || c.status === statusFilter) &&
         [c.ref, c.full_name, c.phone, c.email, c.bac_type, c.bac_year, c.specialty].some((v) =>
           String(v ?? "").toLowerCase().includes(q)
         )
     )
-  }, [candidates, query, city])
+  }, [candidates, query, city, statusFilter])
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<CandidateStatus, number> = { pending: 0, accepted: 0, rejected: 0 }
+    candidates.forEach((c) => counts[c.status]++)
+    return counts
+  }, [candidates])
 
   async function openPreview(candidate: CandidateRow) {
     setSelected(candidate)
@@ -92,6 +145,19 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
               className="h-10 rounded-lg bg-white pl-10"
             />
           </div>
+          <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as CandidateStatus | typeof ALL)}>
+            <SelectTrigger aria-label="Filtrer par statut" className="h-10 rounded-lg bg-white sm:w-auto">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL}>Tous les statuts</SelectItem>
+              {CANDIDATE_STATUSES.map((status) => (
+                <SelectItem key={status} value={status}>
+                  {STATUS_LABEL[status]} ({statusCounts[status]})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={city} onValueChange={setCity}>
             <SelectTrigger aria-label="Filtrer par ville" className="h-10 rounded-lg bg-white sm:w-auto">
               <SelectValue />
@@ -123,6 +189,7 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
               "BAC",
               "Année",
               "Spécialité",
+              "Statut",
               "Documents",
             ].map((label) => (
               <TableHead key={label} className="px-5 text-xs font-semibold tracking-wider whitespace-nowrap text-slate-500 uppercase">
@@ -148,6 +215,9 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
               <TableCell className="px-5">{c.bac_type || "—"}</TableCell>
               <TableCell className="px-5">{c.bac_year ?? "—"}</TableCell>
               <TableCell className="px-5">{c.specialty || "—"}</TableCell>
+              <TableCell className="px-5">
+                <StatusSelect candidate={c} />
+              </TableCell>
               <TableCell className="px-5">
                 <span className="flex flex-wrap gap-1">
                   <Badge variant="secondary" className="bg-slate-100 text-slate-600">CNI</Badge>
@@ -211,6 +281,7 @@ export function CandidatesTable({ candidates }: { candidates: CandidateRow[] }) 
                   ["Type de BAC", selected.bac_type || "Non renseigné"],
                   ["Année d'obtention", selected.bac_year ? String(selected.bac_year) : "Non renseignée"],
                   ["Spécialité", selected.specialty || "Non renseignée"],
+                  ["Statut", STATUS_LABEL[selected.status]],
                   ["Ville", selected.city],
                   ["Adresse", selected.address || "Non renseignée"],
                   ["Date de dépôt", formatDateTime(selected.created_at)],

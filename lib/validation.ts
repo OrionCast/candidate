@@ -55,8 +55,20 @@ export const MIME_EXTENSIONS: Record<string, string> = {
 }
 
 export const BAC_TYPES = ["A", "C", "D", "G1", "G2", "G3", "BG", "F", "R"] as const
-export const BAC_YEARS = Array.from({ length: 12 }, (_, i) => String(2026 - i)) as [string, ...string[]] // 2026 → 2015
-export const SPECIALTIES = ["Infrastructure Réseaux et Connectivité", "Infrastructure Cloud"] as const
+
+const BAC_YEAR_SPAN = 12
+
+/** Années de BAC proposées : l'année en cours et les 11 précédentes. */
+export function bacYearOptions(now: Date = new Date()): string[] {
+  const latest = now.getFullYear()
+  return Array.from({ length: BAC_YEAR_SPAN }, (_, i) => String(latest - i))
+}
+
+export function isValidBacYear(value: string, now: Date = new Date()) {
+  const year = Number(value)
+  const latest = now.getFullYear()
+  return Number.isInteger(year) && year <= latest && year > latest - BAC_YEAR_SPAN
+}
 
 const MIN_AGE = 14
 
@@ -84,8 +96,9 @@ export const applicantSchema = z.object({
   }),
   placeOfBirth: z.string().trim().min(1, "Le lieu de naissance est obligatoire.").max(120),
   bacType: z.enum(BAC_TYPES, "Veuillez sélectionner le type de BAC."),
-  bacYear: z.enum(BAC_YEARS, "Veuillez sélectionner l'année d'obtention du BAC."),
-  specialty: z.enum(SPECIALTIES, "Veuillez sélectionner une spécialité."),
+  // La plage d'années et l'appartenance à la liste des spécialités actives sont vérifiées côté serveur.
+  bacYear: z.string().regex(/^\d{4}$/, "Veuillez sélectionner l'année d'obtention du BAC."),
+  specialty: z.string().trim().min(1, "Veuillez sélectionner une spécialité.").max(100),
   phone: z.string().trim().min(1, "Le numéro de téléphone est obligatoire.").max(30),
   // L'appartenance à la liste des villes actives est vérifiée côté serveur.
   city: z.string().trim().min(1, "Veuillez sélectionner une ville.").max(100),
@@ -119,6 +132,12 @@ export const cityNameSchema = z
   .trim()
   .min(1, "Le nom de la ville est obligatoire.")
   .max(100, "Le nom de la ville est trop long (100 caractères maximum).")
+
+export const specialtyNameSchema = z
+  .string()
+  .trim()
+  .min(1, "Le nom de la spécialité est obligatoire.")
+  .max(100, "Le nom de la spécialité est trop long (100 caractères maximum).")
 
 export const REF_PATTERN = /^CG-\d{4}-\d{6}$/
 export const RESULTS_FILE_PATTERN = /^[a-f0-9]{24}\.pdf$/

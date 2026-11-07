@@ -1,20 +1,47 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { addCity, renameCity, setCityActive } from "@/app/admin/actions"
-import { MapPinIcon } from "@/components/site/icons"
+import { useState, useTransition, type ReactNode } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 
-export type CityRow = { id: string; name: string; active: boolean; candidates: number }
+export type ManagedItem = { id: string; name: string; active: boolean; count: number }
 
 type Result = { ok: true } | { ok: false; error: string }
 
-/** Villes proposées sur le formulaire de candidature, gérées par l'administrateur. */
-export function CitiesCard({ cities }: { cities: CityRow[] }) {
+type Props = {
+  title: string
+  description: string
+  icon: ReactNode
+  iconTone: string
+  items: ManagedItem[]
+  /** Libellé du compteur, par exemple « candidature(s) ». */
+  countLabel: (count: number) => string
+  placeholder: string
+  emptyText: string
+  renameNote: string
+  actions: {
+    add: (name: string) => Promise<Result>
+    rename: (id: string, name: string) => Promise<Result>
+    setActive: (id: string, active: boolean) => Promise<Result>
+  }
+}
+
+/** Liste de valeurs gérée par l'administrateur (villes, spécialités) : ajout, renommage, activation. */
+export function ManagedListCard({
+  title,
+  description,
+  icon,
+  iconTone,
+  items,
+  countLabel,
+  placeholder,
+  emptyText,
+  renameNote,
+  actions,
+}: Props) {
   const [pending, startTransition] = useTransition()
   const [busyId, setBusyId] = useState<string | null>(null)
   const [name, setName] = useState("")
@@ -41,33 +68,29 @@ export function CitiesCard({ cities }: { cities: CityRow[] }) {
     })
   }
 
-  function onAdd(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    run(null, () => addCity(name), "Ville ajoutée.", () => setName(""))
-  }
-
   return (
     <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="flex items-center gap-3 border-b border-slate-200 p-5">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-gold text-gold-ink">
-          <MapPinIcon size={18} />
-        </div>
+        <div className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${iconTone}`}>{icon}</div>
         <div>
-          <h2 className="text-lg font-bold text-slate-800">Villes disponibles</h2>
-          <p className="mt-0.5 text-sm text-slate-500">
-            Ces villes sont proposées sur le formulaire de candidature. Une ville désactivée disparaît du
-            formulaire mais reste dans les filtres et l'historique.
-          </p>
+          <h2 className="text-lg font-bold text-slate-800">{title}</h2>
+          <p className="mt-0.5 text-sm text-slate-500">{description}</p>
         </div>
       </div>
 
       <div className="space-y-5 p-5">
-        <form onSubmit={onAdd} className="flex flex-wrap gap-2">
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            run(null, () => actions.add(name), "Ajouté.", () => setName(""))
+          }}
+          className="flex flex-wrap gap-2"
+        >
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nom de la nouvelle ville"
-            aria-label="Nom de la nouvelle ville"
+            placeholder={placeholder}
+            aria-label={placeholder}
             maxLength={100}
             required
             className="h-10 flex-1 rounded-lg bg-white sm:max-w-sm"
@@ -79,30 +102,26 @@ export function CitiesCard({ cities }: { cities: CityRow[] }) {
         </form>
 
         <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200">
-          {cities.length === 0 && (
-            <li className="p-4 text-sm text-slate-500">Aucune ville. Ajoutez-en une pour ouvrir les candidatures.</li>
-          )}
-          {cities.map((city) => {
-            const isEditing = editing?.id === city.id
-            const busy = pending && busyId === city.id
+          {items.length === 0 && <li className="p-4 text-sm text-slate-500">{emptyText}</li>}
+          {items.map((item) => {
+            const isEditing = editing?.id === item.id
+            const busy = pending && busyId === item.id
             return (
-              <li key={city.id} className="flex flex-wrap items-center gap-3 p-3 sm:px-4">
+              <li key={item.id} className="flex flex-wrap items-center gap-3 p-3 sm:px-4">
                 <div className="min-w-0 flex-1">
                   {isEditing ? (
                     <form
                       className="flex gap-2"
                       onSubmit={(e) => {
                         e.preventDefault()
-                        run(city.id, () => renameCity(city.id, editing.value), "Ville renommée.", () =>
-                          setEditing(null)
-                        )
+                        run(item.id, () => actions.rename(item.id, editing.value), "Renommé.", () => setEditing(null))
                       }}
                     >
                       <Input
                         autoFocus
                         value={editing.value}
-                        onChange={(e) => setEditing({ id: city.id, value: e.target.value })}
-                        aria-label={`Nouveau nom pour ${city.name}`}
+                        onChange={(e) => setEditing({ id: item.id, value: e.target.value })}
+                        aria-label={`Nouveau nom pour ${item.name}`}
                         maxLength={100}
                         required
                         className="h-9 rounded-lg bg-white"
@@ -116,11 +135,11 @@ export function CitiesCard({ cities }: { cities: CityRow[] }) {
                     </form>
                   ) : (
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className={city.active ? "font-semibold text-slate-800" : "font-semibold text-slate-400"}>
-                        {city.name}
+                      <span className={item.active ? "font-semibold text-slate-800" : "font-semibold text-slate-400"}>
+                        {item.name}
                       </span>
                       <Badge variant="secondary" className="bg-slate-100 text-slate-600">
-                        {city.candidates} candidature{city.candidates > 1 ? "s" : ""}
+                        {item.count} {countLabel(item.count)}
                       </Badge>
                     </div>
                   )}
@@ -133,7 +152,7 @@ export function CitiesCard({ cities }: { cities: CityRow[] }) {
                       size="sm"
                       variant="ghost"
                       disabled={pending}
-                      onClick={() => setEditing({ id: city.id, value: city.name })}
+                      onClick={() => setEditing({ id: item.id, value: item.name })}
                       className="rounded-lg"
                     >
                       Renommer
@@ -141,18 +160,14 @@ export function CitiesCard({ cities }: { cities: CityRow[] }) {
                     <label className="flex items-center gap-2 text-sm text-slate-600">
                       {busy ? <Spinner /> : null}
                       <Switch
-                        checked={city.active}
+                        checked={item.active}
                         disabled={pending}
                         onCheckedChange={(checked) =>
-                          run(
-                            city.id,
-                            () => setCityActive(city.id, checked),
-                            checked ? "Ville activée." : "Ville désactivée."
-                          )
+                          run(item.id, () => actions.setActive(item.id, checked), checked ? "Activé." : "Désactivé.")
                         }
-                        aria-label={`${city.name} : ${city.active ? "active" : "désactivée"}`}
+                        aria-label={`${item.name} : ${item.active ? "actif" : "désactivé"}`}
                       />
-                      {city.active ? "Active" : "Désactivée"}
+                      {item.active ? "Active" : "Désactivée"}
                     </label>
                   </div>
                 )}
@@ -161,6 +176,7 @@ export function CitiesCard({ cities }: { cities: CityRow[] }) {
           })}
         </ul>
 
+        <p className="text-xs text-slate-400">{renameNote}</p>
         <p role="status" aria-live="polite" className={status?.error ? "min-h-5 text-sm text-flag-red" : "min-h-5 text-sm text-congo"}>
           {status?.text}
         </p>

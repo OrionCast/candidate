@@ -1,4 +1,5 @@
 import "server-only"
+import type { CandidateStatus } from "@/lib/candidate-status"
 import { createClient } from "@/lib/supabase/server"
 
 export type CandidateRow = {
@@ -15,6 +16,7 @@ export type CandidateRow = {
   bac_year: number | null
   specialty: string | null
   photo_file: string | null
+  status: CandidateStatus
   /** URL signée de la photo (valable 1 h), pour les vignettes du tableau. */
   photo_url: string | null
   created_at: string
@@ -33,7 +35,7 @@ export async function fetchAllCandidates(): Promise<CandidateRow[]> {
     const { data, error } = await supabase
       .from("candidates")
       .select(
-        "id, ref, full_name, email, phone, city, address, date_of_birth, place_of_birth, bac_type, bac_year, specialty, photo_file, created_at"
+        "id, ref, full_name, email, phone, city, address, date_of_birth, place_of_birth, bac_type, bac_year, specialty, photo_file, status, created_at"
       )
       .order("created_at", { ascending: false })
       .range(from, from + PAGE - 1)

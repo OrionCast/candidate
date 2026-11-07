@@ -3,10 +3,13 @@ import Link from "next/link"
 import { NewsList } from "@/components/site/news-list"
 import { PageHero } from "@/components/site/page-hero"
 import { Button } from "@/components/ui/button"
+import { getPublishedNews } from "@/lib/site-data"
 
 export const metadata: Metadata = { title: "Actualités" }
 
-export default function NewsPage() {
+export default async function NewsPage() {
+  const news = await getPublishedNews()
+
   return (
     <>
       <PageHero
@@ -16,7 +19,7 @@ export default function NewsPage() {
         current="Actualités"
       />
 
-      <NewsList />
+      <NewsList items={news} />
 
       <section className="bg-[#eef5ee] py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { NEWS, NEWS_CATEGORIES, type NewsItem } from "@/lib/news"
+import type { NewsItem } from "@/lib/news"
 import { cn } from "@/lib/utils"
 
 const toneClass: Record<NewsItem["tone"], string> = {
@@ -18,25 +18,48 @@ const toneClass: Record<NewsItem["tone"], string> = {
   danger: "border-red-200 bg-red-50 text-red-700",
 }
 
-export function NewsList() {
+const linkClass =
+  "inline-flex items-center gap-1 text-sm font-bold text-congo transition-all hover:gap-2 hover:underline"
+
+function NewsLink({ item }: { item: NewsItem }) {
+  if (!item.linkHref || !item.linkLabel) return <span />
+  const content = (
+    <>
+      {item.linkLabel} <span>→</span>
+    </>
+  )
+  return item.linkHref.startsWith("/") ? (
+    <Link href={item.linkHref} className={linkClass}>
+      {content}
+    </Link>
+  ) : (
+    <a href={item.linkHref} target="_blank" rel="noopener noreferrer" className={linkClass}>
+      {content}
+    </a>
+  )
+}
+
+export function NewsList({ items: news }: { items: NewsItem[] }) {
   const [category, setCategory] = useState<string | null>(null)
   const [query, setQuery] = useState("")
 
+  const categories = useMemo(() => [...new Set(news.map((item) => item.category))], [news])
+
   const items = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return NEWS.filter(
+    return news.filter(
       (item) =>
         (!category || item.category === category) &&
-        (!q || [item.title, item.text, item.kicker].some((v) => v.toLowerCase().includes(q)))
+        (!q || [item.title, item.body, item.kicker].some((v) => v.toLowerCase().includes(q)))
     )
-  }, [category, query])
+  }, [news, category, query])
 
   return (
     <>
-      <section className="sticky top-24 z-20 sm:top-28 border-b border-congo-line bg-white/95 py-5 shadow-sm backdrop-blur">
+      <section className="sticky top-24 z-20 border-b border-congo-line bg-white/95 py-5 shadow-sm backdrop-blur sm:top-28">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
           <div className="flex flex-wrap items-center gap-2">
-            {[null, ...NEWS_CATEGORIES].map((name) => (
+            {[null, ...categories].map((name) => (
               <Button
                 key={name ?? "all"}
                 type="button"
@@ -68,21 +91,22 @@ export function NewsList() {
           <div className="flex flex-col justify-between gap-2 border-b border-slate-200 pb-4 sm:flex-row sm:items-end">
             <div>
               <span className="text-[11px] font-bold tracking-[0.2em] text-congo uppercase">Avis publics</span>
-              <h2 className="mt-1 font-heading text-2xl font-bold text-slate-900 sm:text-3xl">
-                Dernières publications
-              </h2>
+              <h2 className="mt-1 font-display text-2xl font-bold text-slate-900 sm:text-3xl">Dernières publications</h2>
             </div>
             <span className="text-xs text-slate-500">
               {items.length} publication{items.length > 1 ? "s" : ""}
             </span>
           </div>
 
-          {items.length === 0 && (
+          {news.length === 0 && (
+            <p className="py-12 text-center font-medium text-slate-500">Aucune publication pour le moment.</p>
+          )}
+          {news.length > 0 && items.length === 0 && (
             <p className="py-12 text-center font-medium text-slate-500">Aucune publication ne correspond à votre recherche.</p>
           )}
 
           <div className="grid gap-8 md:grid-cols-2">
-            {items.map((item) => (
+            {items.map((item, index) => (
               <Card
                 key={item.id}
                 className="group flex flex-col justify-between rounded-2xl border border-congo-line bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:p-8"
@@ -97,21 +121,21 @@ export function NewsList() {
                     >
                       {item.badge}
                     </Badge>
-                    <span className="text-xs font-bold text-slate-400">N° {item.number}</span>
+                    <span className="text-xs font-bold text-slate-400">N° {String(index + 1).padStart(2, "0")}</span>
                   </div>
                   <div className="space-y-2">
-                    <span className="text-xs font-medium tracking-wide text-slate-400 uppercase">{item.kicker}</span>
+                    {item.kicker && (
+                      <span className="text-xs font-medium tracking-wide text-slate-400 uppercase">{item.kicker}</span>
+                    )}
                     <h3 className="text-xl leading-snug font-bold text-slate-900 transition-colors group-hover:text-congo">
                       {item.title}
                     </h3>
-                    <p className="text-sm leading-relaxed text-slate-600">{item.text}</p>
+                    <p className="text-sm leading-relaxed whitespace-pre-line text-slate-600">{item.body}</p>
                   </div>
                 </div>
                 <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-                  <Link href={item.href} className="inline-flex items-center gap-1 text-sm font-bold text-congo transition-all hover:gap-2 hover:underline">
-                    {item.cta} <span>→</span>
-                  </Link>
-                  <span className="text-xs text-slate-400">{item.meta}</span>
+                  <NewsLink item={item} />
+                  {item.meta && <span className="text-xs text-slate-400">{item.meta}</span>}
                 </div>
               </Card>
             ))}
@@ -124,10 +148,8 @@ export function NewsList() {
             <div className="space-y-1 text-sm leading-relaxed text-amber-900">
               <h4 className="text-base font-bold text-amber-950">Avis d'information institutionnel</h4>
               <p>
-                Les articles présentés ci-dessus servent de démonstration pour le fonctionnement du portail
-                officiel. Veuillez consulter régulièrement les annonces publiées par les ministères et
-                organismes partenaires pour connaître les dates officielles d'ouverture et de clôture des
-                registres.
+                Consultez régulièrement les annonces publiées par les ministères et organismes partenaires pour connaître
+                les dates officielles d'ouverture et de clôture des registres.
               </p>
             </div>
           </div>

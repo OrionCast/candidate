@@ -1,5 +1,6 @@
 import { getAdmin } from "@/lib/auth"
 import { fetchAllCandidates } from "@/lib/candidates"
+import { STATUS_LABEL } from "@/lib/candidate-status"
 import { formatDateOnly, formatDateTime } from "@/lib/format"
 
 const quote = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`
@@ -23,6 +24,7 @@ export async function GET() {
     "Type BAC",
     "Année obtention",
     "Spécialité",
+    "Statut",
   ]
   const lines = rows.map((r) =>
     [
@@ -38,6 +40,7 @@ export async function GET() {
       r.bac_type,
       r.bac_year,
       r.specialty,
+      STATUS_LABEL[r.status],
     ]
       .map(quote)
       .join(";")

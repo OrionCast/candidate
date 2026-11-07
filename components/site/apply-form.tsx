@@ -15,11 +15,9 @@ import { Spinner } from "@/components/ui/spinner"
 import { createBrowserSupabase } from "@/lib/supabase/browser"
 import {
   BAC_TYPES,
-  BAC_YEARS,
   DOCUMENT_KINDS,
   DOCUMENT_RULES,
   REQUIRED_DOCUMENTS,
-  SPECIALTIES,
   applicantSchema,
   checkFile,
   type DocumentKind,
@@ -66,7 +64,13 @@ function SelectField({ id, label, placeholder, value, onChange, options }: Selec
   )
 }
 
-export function ApplyForm({ cities }: { cities: string[] }) {
+type ApplyFormProps = {
+  cities: string[]
+  specialties: string[]
+  bacYears: string[]
+}
+
+export function ApplyForm({ cities, specialties, bacYears }: ApplyFormProps) {
   const formRef = useRef<HTMLFormElement>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
@@ -272,10 +276,10 @@ export function ApplyForm({ cities }: { cities: string[] }) {
 
           <div className="grid gap-5 sm:grid-cols-2">
             <SelectField id="bacType" label="Type de BAC" placeholder="— Sélectionnez un BAC —" value={bacType} onChange={setBacType} options={BAC_TYPES} />
-            <SelectField id="bacYear" label="Année d'obtention" placeholder="— Sélectionnez une année —" value={bacYear} onChange={setBacYear} options={BAC_YEARS} />
+            <SelectField id="bacYear" label="Année d'obtention" placeholder="— Sélectionnez une année —" value={bacYear} onChange={setBacYear} options={bacYears} />
           </div>
 
-          <SelectField id="specialty" label="Spécialité" placeholder="— Sélectionnez une spécialité —" value={specialty} onChange={setSpecialty} options={SPECIALTIES} />
+          <SelectField id="specialty" label="Spécialité" placeholder="— Sélectionnez une spécialité —" value={specialty} onChange={setSpecialty} options={specialties} />
 
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">

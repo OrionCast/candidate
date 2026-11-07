@@ -7,6 +7,7 @@ Les migrations de `migrations/` sont à exécuter dans l'ordre (SQL Editor du ta
 3. `..._storage.sql` : buckets `documents` (privé) et `results` (public)
 4. `..._cities.sql` : table `cities` (villes du formulaire, gérées depuis l'admin) avec Brazzaville et Pointe-Noire
 5. `..._applicant_profile.sql` : date et lieu de naissance, BAC, spécialité, photo de profil ; fichiers limités à 30 Mo
+6. `..._site_content.sql` : réglages du site (période d'appel, coordonnées), spécialités, statut des candidatures, actualités et galerie (bucket `gallery`)
 
 ## Donner le rôle admin à un compte
 

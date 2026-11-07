@@ -8,21 +8,21 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog"
 import {
   CATEGORY_LABEL,
-  GALLERY,
   GALLERY_CATEGORIES,
-  photoUrl,
+  resizedSrc,
   type GalleryCategory,
+  type GalleryEntry,
 } from "@/lib/gallery"
 import { cn } from "@/lib/utils"
 
 /** Galerie filtrable avec visionneuse plein écran (flèches du clavier prises en charge). */
-export function GalleryGrid() {
+export function GalleryGrid({ photos }: { photos: GalleryEntry[] }) {
   const [category, setCategory] = useState<GalleryCategory | null>(null)
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   const items = useMemo(
-    () => GALLERY.filter((item) => !category || item.category === category),
-    [category]
+    () => photos.filter((item) => !category || item.category === category),
+    [photos, category]
   )
 
   const current = openIndex !== null ? items[openIndex] : null
@@ -68,7 +68,7 @@ export function GalleryGrid() {
               className="absolute inset-0 z-10 cursor-pointer rounded-[1.25rem]"
             />
             <Image
-              src={photoUrl(item.photo, 800, 70)}
+              src={resizedSrc(item.src, 800, 70)}
               alt={item.title}
               fill
               sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
@@ -111,7 +111,7 @@ export function GalleryGrid() {
               <DialogDescription className="sr-only">{current.place}</DialogDescription>
               <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl bg-black">
                 <Image
-                  src={photoUrl(current.photo, 1600, 80)}
+                  src={resizedSrc(current.src, 1600, 80)}
                   alt={current.title}
                   fill
                   sizes="(min-width: 1024px) 64rem, 100vw"

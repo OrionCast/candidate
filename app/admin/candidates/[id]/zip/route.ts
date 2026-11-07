@@ -1,6 +1,7 @@
 import { strToU8, zipSync } from "fflate"
 import { z } from "zod"
 import { getAdmin } from "@/lib/auth"
+import { STATUS_LABEL, isCandidateStatus } from "@/lib/candidate-status"
 import { formatDateOnly, formatDateTime } from "@/lib/format"
 import { createClient } from "@/lib/supabase/server"
 
@@ -16,6 +17,7 @@ type Candidate = {
   bac_type: string | null
   bac_year: number | null
   specialty: string | null
+  status: string
   created_at: string
 }
 
@@ -35,6 +37,7 @@ function infoSheet(c: Candidate) {
     `Ville              : ${c.city}`,
     `Adresse            : ${c.address || "Non renseignée"}`,
     `Date de dépôt      : ${formatDateTime(c.created_at)}`,
+    `Statut             : ${isCandidateStatus(c.status) ? STATUS_LABEL[c.status] : c.status}`,
     "",
     "FICHIERS INCLUS",
     "----------------------------------------",

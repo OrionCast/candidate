@@ -3,6 +3,8 @@ import { Call02Icon } from "@hugeicons/core-free-icons"
 import Link from "next/link"
 import { Brand } from "@/components/site/brand"
 import { Particles } from "@/components/site/particles"
+import { getSiteSettings } from "@/lib/site-data"
+import { phoneHref } from "@/lib/site-settings"
 
 const navigation = [
   { href: "/", label: "Accueil" },
@@ -14,7 +16,9 @@ const navigation = [
 
 const tags = ["Réseaux", "Cloud", "Connectivité"]
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const settings = await getSiteSettings()
+
   return (
     <footer className="footer-green relative text-white">
       <Particles density={1 / 16000} link={120} />
@@ -79,14 +83,19 @@ export function SiteFooter() {
                   <HugeiconsIcon icon={Call02Icon} size={20} strokeWidth={2} />
                 </span>
                 <div className="min-w-0">
-                  <a href="tel:+242068953275" className="block text-sm font-semibold text-white transition-colors hover:text-yellow-300">
-                    +242 06 895 32 75 <br /> +242 05 745 89 42
+                  <a href={phoneHref(settings.phonePrimary)} className="block text-sm font-semibold text-white transition-colors hover:text-yellow-300">
+                    {settings.phonePrimary}
                   </a>
+                  {settings.phoneSecondary && (
+                    <a href={phoneHref(settings.phoneSecondary)} className="block text-sm font-semibold text-white transition-colors hover:text-yellow-300">
+                      {settings.phoneSecondary}
+                    </a>
+                  )}
                   <a
-                    href="mailto:formationpatn@cciamb-cnia.cg"
+                    href={`mailto:${settings.contactEmail}`}
                     className="block text-xs break-all text-emerald-50/70 transition-colors hover:text-yellow-300"
                   >
-                    formationpatn@cciamb-cnia.cg
+                    {settings.contactEmail}
                   </a>
                 </div>
               </div>

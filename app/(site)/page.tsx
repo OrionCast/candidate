@@ -14,6 +14,8 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import type { ReactNode } from "react"
 import { Particles } from "@/components/site/particles"
+import { getSiteSettings } from "@/lib/site-data"
+import { formatLongDate, phoneHref } from "@/lib/site-settings"
 
 export const metadata: Metadata = {
   title: "Accueil",
@@ -26,11 +28,11 @@ function Glyph({ icon, size = 24 }: { icon: Icon; size?: number }) {
   return <HugeiconsIcon icon={icon} size={size} strokeWidth={1.8} />
 }
 
-const keyFigures: { icon: Icon; tone: string; title: ReactNode; text: string }[] = [
+const keyFigures = (places: number): { icon: Icon; tone: string; title: ReactNode; text: string }[] => [
   {
     icon: Mortarboard01Icon,
     tone: "from-emerald-100 to-emerald-50 border-emerald-100 text-congo",
-    title: <p className="text-4xl leading-none font-black tracking-tight text-congo">300</p>,
+    title: <p className="text-4xl leading-none font-black tracking-tight text-congo">{places}</p>,
     text: "Jeunes à former",
   },
   {
@@ -99,7 +101,12 @@ function CardNetwork({ points }: { points: [number, number][] }) {
   )
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const settings = await getSiteSettings()
+  const places = settings.placesCount
+  const opens = formatLongDate(settings.applyOpensAt)
+  const closes = formatLongDate(settings.applyClosesAt)
+
   return (
     <>
       {/* Hero */}
@@ -182,7 +189,7 @@ export default function HomePage() {
               </div>
 
               <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/15 pt-8 text-sm text-emerald-50/85">
-                {["Formation gratuite", "300 places disponibles", "Brazzaville et Pointe-Noire"].map((label) => (
+                {["Formation gratuite", `${places} places disponibles`, "Brazzaville et Pointe-Noire"].map((label) => (
                   <span key={label} className="flex items-center gap-2.5">
                     <span className="flex size-5 items-center justify-center rounded-full bg-yellow-400/20 text-yellow-300">
                       <HugeiconsIcon icon={Tick02Icon} size={12} strokeWidth={3} />
@@ -233,7 +240,7 @@ export default function HomePage() {
                   </div>
 
                   <div className="relative mt-7 rounded-xl bg-gradient-to-r from-congo to-congo-dark py-4 text-center text-sm font-bold tracking-wide text-white shadow-lg shadow-congo/25">
-                    Formation gratuite · 300 jeunes
+                    Formation gratuite · {places} jeunes
                   </div>
                 </div>
               </div>
@@ -248,7 +255,7 @@ export default function HomePage() {
       <section className="relative -mt-px bg-white">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-            {keyFigures.map((item, index) => (
+            {keyFigures(places).map((item, index) => (
               <div
                 key={item.text}
                 className={`group lift scroll-reveal flex items-center gap-5 rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-white p-6 shadow-soft scroll-delay-${index + 1}`}
@@ -318,7 +325,7 @@ export default function HomePage() {
                 <div className="absolute -top-8 -right-8 size-36 rounded-full bg-white/10 transition-transform duration-500 group-hover:scale-125" />
                 <div className="absolute -bottom-10 -left-10 size-32 rounded-full bg-yellow-400/10 transition-transform duration-500 group-hover:scale-125" />
                 <p className="relative text-sm font-semibold text-emerald-200">Bénéficiaires</p>
-                <p className="shimmer relative mt-3 text-7xl font-black tracking-tight text-yellow-300">300</p>
+                <p className="shimmer relative mt-3 text-7xl font-black tracking-tight text-yellow-300">{places}</p>
                 <p className="relative mt-1 text-emerald-100">jeunes à former</p>
               </div>
 
@@ -506,8 +513,14 @@ export default function HomePage() {
               <p className="relative mt-6 text-[11px] font-extrabold tracking-[.16em] text-yellow-800 uppercase">
                 Période de l'appel à candidature
               </p>
-              <p className="relative mt-3 text-lg leading-snug font-semibold text-slate-900">Du 23 Novembre 2026</p>
-              <p className="relative mt-1 text-lg leading-snug font-semibold text-slate-900">Au 6 Décembre 2026</p>
+              {opens || closes ? (
+                <>
+                  {opens && <p className="relative mt-3 text-lg leading-snug font-semibold text-slate-900">Du {opens}</p>}
+                  {closes && <p className="relative mt-1 text-lg leading-snug font-semibold text-slate-900">Au {closes}</p>}
+                </>
+              ) : (
+                <p className="relative mt-3 text-lg leading-snug font-semibold text-slate-900">Dates à annoncer</p>
+              )}
             </article>
 
             <article className="lift group scroll-reveal scroll-delay-2 relative overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-green-50/50 p-8 shadow-soft">
@@ -526,17 +539,19 @@ export default function HomePage() {
                 <Glyph icon={Call02Icon} size={26} />
               </div>
               <p className="relative mt-6 text-[11px] font-extrabold tracking-[.16em] text-blue-800 uppercase">Pour plus d'informations</p>
-              <a href="tel:+242068953275" className="relative mt-3 block text-lg leading-snug font-semibold text-slate-900 transition-colors hover:text-blue-800">
-                +242 06 895 32 75
+              <a href={phoneHref(settings.phonePrimary)} className="relative mt-3 block text-lg leading-snug font-semibold text-slate-900 transition-colors hover:text-blue-800">
+                {settings.phonePrimary}
               </a>
-              <a href="tel:+242057458942" className="relative mt-1 block text-lg leading-snug font-semibold text-slate-900 transition-colors hover:text-blue-800">
-                +242 05 745 89 42
-              </a>
+              {settings.phoneSecondary && (
+                <a href={phoneHref(settings.phoneSecondary)} className="relative mt-1 block text-lg leading-snug font-semibold text-slate-900 transition-colors hover:text-blue-800">
+                  {settings.phoneSecondary}
+                </a>
+              )}
               <a
-                href="mailto:formationpatn@cciamb-cnia.cg"
+                href={`mailto:${settings.contactEmail}`}
                 className="relative mt-4 block text-sm font-medium break-all text-blue-800 underline-offset-2 hover:underline"
               >
-                formationpatn@cciamb-cnia.cg
+                {settings.contactEmail}
               </a>
             </article>
           </div>
@@ -547,7 +562,7 @@ export default function HomePage() {
             </span>
             <div>
               <p className="text-[11px] font-extrabold tracking-[.16em] text-slate-500 uppercase">Adresse</p>
-              <p className="mt-1 text-[15px] font-bold text-slate-900">92 Avenue Amilcar CABRAL, Centre-ville, Brazzaville</p>
+              <p className="mt-1 text-[15px] font-bold text-slate-900">{settings.address}</p>
             </div>
           </div>
         </div>

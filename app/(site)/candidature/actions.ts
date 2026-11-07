@@ -11,8 +11,10 @@ import {
   applicantSchema,
   checkFile,
   fileMetaSchema,
+  isValidBacYear,
   type DocumentKind,
 } from "@/lib/validation"
+import { applicationState, mapSettings } from "@/lib/site-settings"
 
 const BUCKET = "documents"
 
@@ -60,6 +62,28 @@ async function isActiveCity(name: string) {
   return Boolean(data)
 }
 
+async function isActiveSpecialty(name: string) {
+  const { data } = await createAdminClient()
+    .from("specialties")
+    .select("id")
+    .eq("name", name)
+    .eq("active", true)
+    .maybeSingle()
+  return Boolean(data)
+}
+
+/** Vérifie les règles qui dépendent de la base : période d'appel, ville, spécialité, année de BAC. */
+async function checkApplicantRules(applicant: { city: string; specialty: string; bacYear: string }) {
+  const { data } = await createAdminClient().from("site_settings").select("*").eq("id", 1).maybeSingle()
+  const state = applicationState(mapSettings(data), Date.now())
+  if (state === "not_yet") return "Les candidatures ne sont pas encore ouvertes."
+  if (state === "closed") return "Les candidatures sont closes."
+  if (!(await isActiveCity(applicant.city))) return "Veuillez sélectionner une ville dans la liste."
+  if (!(await isActiveSpecialty(applicant.specialty))) return "Veuillez sélectionner une spécialité dans la liste."
+  if (!isValidBacYear(applicant.bacYear)) return "L'année d'obtention du BAC n'est pas valide."
+  return null
+}
+
 /**
  * Étape 1 : valide le formulaire et délivre des URLs signées.
  * Les fichiers partent ensuite directement du navigateur vers Supabase Storage,
@@ -70,9 +94,8 @@ export async function prepareApplication(input: unknown): Promise<PrepareResult>
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) }
   const { files } = parsed.data
 
-  if (!(await isActiveCity(parsed.data.applicant.city))) {
-    return { ok: false, error: "Veuillez sélectionner une ville dans la liste." }
-  }
+  const rule = await checkApplicantRules(parsed.data.applicant)
+  if (rule) return { ok: false, error: rule }
 
   for (const kind of DOCUMENT_KINDS) {
     const problem = checkFile(kind, files[kind])
@@ -113,9 +136,8 @@ export async function finalizeApplication(input: unknown): Promise<FinalizeResul
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) }
   const { ref, applicant, paths } = parsed.data
 
-  if (!(await isActiveCity(applicant.city))) {
-    return { ok: false, error: "Veuillez sélectionner une ville dans la liste." }
-  }
+  const rule = await checkApplicantRules(applicant)
+  if (rule) return { ok: false, error: rule }
 
   const admin = createAdminClient()
   const storage = admin.storage.from(BUCKET)

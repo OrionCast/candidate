@@ -6,6 +6,7 @@ import { ContactForm } from "@/components/site/contact-form"
 import { FlagBar } from "@/components/site/flag-bar"
 import { MessageIcon } from "@/components/site/icons"
 import { PageHero } from "@/components/site/page-hero"
+import { getSiteSettings } from "@/lib/site-data"
 
 export const metadata: Metadata = { title: "Contact" }
 
@@ -34,7 +35,9 @@ const topics = [
   },
 ]
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const settings = await getSiteSettings()
+
   return (
     <>
       <PageHero
@@ -96,7 +99,7 @@ export default function ContactPage() {
                 * Obligatoire
               </span>
             </div>
-            <ContactForm />
+            <ContactForm email={settings.contactEmail} />
           </section>
         </div>
       </section>

@@ -15,15 +15,12 @@ const SUBJECTS = [
   "Autre demande",
 ]
 
-// Adresse officielle du programme PATN, modifiable via NEXT_PUBLIC_CONTACT_EMAIL.
-const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "formationpatn@cciamb-cnia.cg"
-
 function Required() {
   return <span className="text-flag-red">*</span>
 }
 
 /** Prépare un e-mail dans la messagerie du visiteur (comme le projet d'origine). */
-export function ContactForm() {
+export function ContactForm({ email: CONTACT_EMAIL }: { email: string }) {
   const [subject, setSubject] = useState("")
   const [status, setStatus] = useState<{ text: string; error: boolean } | null>(null)
 

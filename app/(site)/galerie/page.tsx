@@ -2,13 +2,16 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { GalleryGrid } from "@/components/site/gallery-grid"
 import { Particles } from "@/components/site/particles"
+import { getPublishedGallery } from "@/lib/site-data"
 
 export const metadata: Metadata = {
   title: "Galerie",
   description: "Les moments forts du programme PATN : sessions de formation, ateliers pratiques et événements.",
 }
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const photos = await getPublishedGallery()
+
   return (
     <>
       <section className="hero-bg relative overflow-hidden text-white">
@@ -74,7 +77,7 @@ export default function GalleryPage() {
             </p>
           </div>
 
-          <GalleryGrid />
+          <GalleryGrid photos={photos} />
         </div>
       </section>
 
