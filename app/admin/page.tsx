@@ -117,7 +117,7 @@ async function Dashboard() {
               icon={<MapPinIcon size={18} />}
               iconTone="bg-gold text-gold-ink"
               items={toItems(cityRows.data, perCity)}
-              countLabel={(n) => (n > 1 ? "candidatures" : "candidature")}
+              countNoun="candidature"
               placeholder="Nom de la nouvelle ville"
               emptyText="Aucune ville. Ajoutez-en une pour ouvrir les candidatures."
               renameNote="Renommer ne change pas les candidatures déjà déposées : elles gardent l'ancien nom."
@@ -129,7 +129,7 @@ async function Dashboard() {
               icon={<FileTextIcon size={18} />}
               iconTone="bg-congo text-white"
               items={toItems(specialtyRows.data, perSpecialty)}
-              countLabel={(n) => (n > 1 ? "candidatures" : "candidature")}
+              countNoun="candidature"
               placeholder="Nom de la nouvelle spécialité"
               emptyText="Aucune spécialité. Ajoutez-en une pour ouvrir les candidatures."
               renameNote="Renommer ne change pas les candidatures déjà déposées : elles gardent l'ancien nom."

@@ -17,8 +17,8 @@ type Props = {
   icon: ReactNode
   iconTone: string
   items: ManagedItem[]
-  /** Libellé du compteur, par exemple « candidature(s) ». */
-  countLabel: (count: number) => string
+  /** Nom au singulier compté à côté de chaque valeur, par exemple « candidature ». */
+  countNoun: string
   placeholder: string
   emptyText: string
   renameNote: string
@@ -36,7 +36,7 @@ export function ManagedListCard({
   icon,
   iconTone,
   items,
-  countLabel,
+  countNoun,
   placeholder,
   emptyText,
   renameNote,
@@ -139,7 +139,7 @@ export function ManagedListCard({
                         {item.name}
                       </span>
                       <Badge variant="secondary" className="bg-slate-100 text-slate-600">
-                        {item.count} {countLabel(item.count)}
+                        {item.count} {item.count > 1 ? `${countNoun}s` : countNoun}
                       </Badge>
                     </div>
                   )}
